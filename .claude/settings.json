@@ -1,0 +1,45 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".jettypod/hooks/protect-claude-md.js"
+          },
+          {
+            "type": "command",
+            "command": ".jettypod/hooks/global-guardrails.js"
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".jettypod/hooks/protect-claude-md.js"
+          },
+          {
+            "type": "command",
+            "command": ".jettypod/hooks/global-guardrails.js"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".jettypod/hooks/enforce-skill-activation.js"
+          },
+          {
+            "type": "command",
+            "command": ".jettypod/hooks/global-guardrails.js"
+          }
+        ]
+      }
+    ]
+  }
+}
