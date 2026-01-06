@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Jetty Method - Chapter 1</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.7;
+      color: #1a1a1a;
+      background: #fafafa;
+    }
+
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: 16px 40px;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid #e5e5e5;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-weight: 700;
+      font-size: 16px;
+      color: #111;
+      text-decoration: none;
+    }
+
+    .progress-bar {
+      height: 3px;
+      background: #e5e5e5;
+      border-radius: 3px;
+      width: 200px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 15%;
+      background: linear-gradient(90deg, #6366f1, #8b5cf6);
+      border-radius: 3px;
+      transition: width 0.3s ease;
+    }
+
+    main {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 120px 20px 100px;
+    }
+
+    .chapter-label {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #6366f1;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-size: 40px;
+      font-weight: 700;
+      margin-bottom: 24px;
+      line-height: 1.2;
+      letter-spacing: -0.5px;
+    }
+
+    .chapter-meta {
+      display: flex;
+      gap: 20px;
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 50px;
+      padding-bottom: 30px;
+      border-bottom: 1px solid #e5e5e5;
+    }
+
+    h2 {
+      font-size: 24px;
+      font-weight: 600;
+      margin: 50px 0 20px;
+      letter-spacing: -0.3px;
+    }
+
+    p {
+      margin-bottom: 20px;
+      font-size: 17px;
+      color: #333;
+    }
+
+    .callout {
+      background: linear-gradient(135deg, #f0f0ff 0%, #f5f3ff 100%);
+      border-left: 4px solid #6366f1;
+      padding: 20px 24px;
+      margin: 30px 0;
+      border-radius: 0 12px 12px 0;
+    }
+
+    .callout p {
+      margin: 0;
+      font-size: 16px;
+      color: #4338ca;
+    }
+
+    .prompt-block {
+      background: #1e1e2e;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 30px 0;
+      position: relative;
+    }
+
+    .prompt-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #888;
+      margin-bottom: 12px;
+    }
+
+    .prompt-text {
+      font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+      font-size: 14px;
+      color: #e2e8f0;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+
+    .copy-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: #374151;
+      border: none;
+      color: #9ca3af;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .copy-btn:hover {
+      background: #4b5563;
+      color: #fff;
+    }
+
+    .copy-btn.copied {
+      background: #059669;
+      color: #fff;
+    }
+
+    details {
+      background: #fff;
+      border: 1px solid #e5e5e5;
+      border-radius: 12px;
+      margin: 30px 0;
+      overflow: hidden;
+    }
+
+    summary {
+      padding: 16px 20px;
+      cursor: pointer;
+      font-weight: 600;
+      color: #333;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    summary:hover {
+      background: #f9fafb;
+    }
+
+    summary::before {
+      content: "\25B6";
+      font-size: 10px;
+      transition: transform 0.2s;
+    }
+
+    details[open] summary::before {
+      transform: rotate(90deg);
+    }
+
+    .details-content {
+      padding: 0 20px 20px;
+      font-size: 15px;
+      color: #555;
+    }
+
+    .nav-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 60px;
+      padding-top: 30px;
+      border-top: 1px solid #e5e5e5;
+    }
+
+    .nav-btn {
+      display: flex;
+      flex-direction: column;
+      text-decoration: none;
+      padding: 16px 20px;
+      border-radius: 12px;
+      transition: background 0.2s;
+    }
+
+    .nav-btn:hover {
+      background: #f3f4f6;
+    }
+
+    .nav-btn.next {
+      text-align: right;
+      margin-left: auto;
+    }
+
+    .nav-direction {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 4px;
+    }
+
+    .nav-title {
+      font-weight: 600;
+      color: #111;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="#" class="logo">The Jetty Method</a>
+    <div class="progress-bar">
+      <div class="progress-fill"></div>
+    </div>
+  </header>
+
+  <main>
+    <div class="chapter-label">Chapter 1</div>
+    <h1>Why Natural Language Changes Everything</h1>
+
+    <div class="chapter-meta">
+      <span>8 min read</span>
+      <span>&middot;</span>
+      <span>Fundamentals</span>
+    </div>
+
+    <h2>The old way of building software</h2>
+    <p>For decades, building software meant learning to speak the language of computers. You had to understand syntax, memorize commands, and think in terms of loops, variables, and functions.</p>
+    <p>This created a barrier. If you had an idea for something useful, you either needed to spend years learning to code, or you needed to find (and pay) someone who already knew how.</p>
+
+    <div class="callout">
+      <p><strong>Key insight:</strong> The barrier was never intelligence. It was translation&mdash;turning human ideas into computer instructions.</p>
+    </div>
+
+    <h2>What changed with AI</h2>
+    <p>Large language models like Claude flipped the script. Instead of you learning to speak computer, the computer learned to understand you.</p>
+    <p>You can now describe what you want in plain English, and Claude will write the code. But here's what most people miss: this isn't magic, and it's not automatic. It's a skill.</p>
+
+    <details>
+      <summary>What do I mean by "skill"?</summary>
+      <div class="details-content">
+        <p>Think about giving directions to a stranger vs. a local. With a local, you can say "head toward downtown" and they'll figure it out. With a stranger, you need to be specific: "Turn left at the light, go three blocks, turn right at the coffee shop."</p>
+        <p>Claude is brilliant, but it's a stranger to your specific project. The skill is learning what context it needs and how to provide it.</p>
+      </div>
+    </details>
+
+    <h2>A new skill: Communicating intent</h2>
+    <p>The skill isn't coding anymore. The skill is clearly communicating your intent. What do you want to build? What should it do? What should happen when things go wrong?</p>
+
+    <div class="prompt-block">
+      <button class="copy-btn" onclick="copyPrompt(this)">Copy</button>
+      <div class="prompt-label">Example prompt</div>
+      <div class="prompt-text">I want to build a simple todo list app.
+When I type a task and press Enter, it should add to the list.
+When I click a task, it should mark it as done with a strikethrough.
+I should be able to delete tasks by clicking an X button.</div>
+    </div>
+
+    <p>Notice how the prompt above describes behavior, not implementation. You're telling Claude what you want to experience, not how to code it.</p>
+
+    <h2>Who this method is for</h2>
+    <p>You don't need a computer science degree. You don't need to know what a variable is. You need curiosity, patience, and a willingness to iterate.</p>
+    <p>If you can explain what you want to a smart colleague, you can build software with Claude.</p>
+
+    <div class="nav-buttons">
+      <a href="#" class="nav-btn next">
+        <span class="nav-direction">Next chapter</span>
+        <span class="nav-title">Setting Up Your Environment &rarr;</span>
+      </a>
+    </div>
+  </main>
+
+  <script>
+    function copyPrompt(btn) {
+      const text = btn.parentElement.querySelector('.prompt-text').textContent;
+      navigator.clipboard.writeText(text);
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = 'Copy';
+        btn.classList.remove('copied');
+      }, 2000);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Jetty Method - Introduction</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Georgia, 'Times New Roman', serif;
+      line-height: 1.8;
+      color: #2c2c2c;
+      background: #fffef9;
+    }
+
+    .layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Left Sidebar */
+    .sidebar {
+      width: 320px;
+      flex-shrink: 0;
+      padding: 40px 30px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      border-right: 2px solid #2c2c2c;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .logo {
+      font-family: 'Caveat', cursive;
+      font-size: 24px;
+      color: #fff;
+      text-decoration: none;
+      background: #2c2c2c;
+      padding: 12px 20px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 40px;
+    }
+
+    .logo-icon {
+      font-size: 18px;
+    }
+
+    .chapter-label {
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #666;
+      margin-bottom: 10px;
+    }
+
+    .chapter-title {
+      font-size: 32px;
+      font-weight: 400;
+      line-height: 1.2;
+      margin-bottom: 30px;
+    }
+
+    .toc {
+      flex: 1;
+    }
+
+    .toc a {
+      display: block;
+      color: #2c2c2c;
+      text-decoration: underline;
+      font-style: italic;
+      font-size: 15px;
+      margin-bottom: 10px;
+      transition: color 0.2s;
+    }
+
+    .toc a:hover {
+      color: #000;
+    }
+
+    .next-link {
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #ddd;
+    }
+
+    .next-link a {
+      color: #2c2c2c;
+      text-decoration: none;
+      font-size: 15px;
+    }
+
+    .next-link a:hover {
+      text-decoration: underline;
+    }
+
+    /* Main Content */
+    .content {
+      flex: 1;
+      max-width: 700px;
+      padding: 60px 50px 100px;
+    }
+
+    .chapter-intro {
+      font-size: 22px;
+      font-style: italic;
+      color: #555;
+      margin-bottom: 50px;
+      padding-bottom: 40px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .visual-break {
+      display: flex;
+      justify-content: center;
+      margin: 50px 0;
+    }
+
+    .sketch {
+      background: #fff;
+      border: 2px solid #2c2c2c;
+      border-radius: 4px;
+      padding: 35px;
+      max-width: 450px;
+      position: relative;
+      transform: rotate(-1deg);
+      box-shadow: 4px 4px 0 #2c2c2c;
+    }
+
+    .sketch svg {
+      width: 100%;
+      height: auto;
+    }
+
+    .sketch-caption {
+      font-family: 'Caveat', cursive;
+      font-size: 18px;
+      text-align: center;
+      margin-top: 15px;
+      color: #555;
+    }
+
+    h2 {
+      font-size: 28px;
+      font-weight: 400;
+      margin: 50px 0 25px;
+      padding-left: 20px;
+      border-left: 4px solid #2c2c2c;
+    }
+
+    h2 a.anchor {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    h2 a.anchor:hover::after {
+      content: ' #';
+      color: #ccc;
+    }
+
+    p {
+      margin-bottom: 20px;
+      font-size: 18px;
+    }
+
+    .highlight {
+      background: linear-gradient(180deg, transparent 60%, #fff3a8 60%);
+      padding: 0 4px;
+    }
+
+    .margin-note {
+      background: #f9f9f5;
+      border-left: 4px solid #2c2c2c;
+      padding: 15px 20px;
+      margin: 25px 0;
+      font-family: 'Caveat', cursive;
+      font-size: 19px;
+      color: #555;
+      border-radius: 0 8px 8px 0;
+    }
+
+    .pain-points {
+      background: #fff;
+      border: 2px solid #2c2c2c;
+      border-radius: 8px;
+      padding: 30px 35px;
+      margin: 30px 0;
+      position: relative;
+    }
+
+    .pain-points::before {
+      content: 'Sound familiar?';
+      font-family: 'Caveat', cursive;
+      font-size: 16px;
+      color: #666;
+      position: absolute;
+      top: -12px;
+      left: 20px;
+      background: #fffef9;
+      padding: 0 10px;
+    }
+
+    .pain-points ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .pain-points li {
+      position: relative;
+      padding-left: 30px;
+      margin-bottom: 15px;
+      font-size: 17px;
+    }
+
+    .pain-points li:last-child {
+      margin-bottom: 0;
+    }
+
+    .pain-points li::before {
+      content: '~';
+      position: absolute;
+      left: 0;
+      font-family: 'Caveat', cursive;
+      font-size: 24px;
+      color: #c00;
+      top: -2px;
+    }
+
+    .big-quote {
+      font-family: 'Caveat', cursive;
+      font-size: 36px;
+      text-align: center;
+      padding: 40px 20px;
+      margin: 50px 0;
+      color: #2c2c2c;
+      position: relative;
+    }
+
+    .big-quote::before,
+    .big-quote::after {
+      content: '"';
+      font-size: 72px;
+      color: #ddd;
+      position: absolute;
+    }
+
+    .big-quote::before {
+      top: 0;
+      left: 0;
+    }
+
+    .big-quote::after {
+      bottom: -20px;
+      right: 0;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      margin: 50px 0;
+      color: #ccc;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #ddd;
+    }
+
+    /* Mobile */
+    @media (max-width: 900px) {
+      .layout {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        border-right: none;
+        border-bottom: 2px solid #2c2c2c;
+        padding: 30px 20px;
+      }
+
+      .content {
+        padding: 40px 20px 80px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <a href="#" class="logo">
+        <span class="logo-icon">&#9776;</span>
+        The Jetty Method
+      </a>
+
+      <div class="chapter-label">Introduction</div>
+      <h1 class="chapter-title">Welcome</h1>
+
+      <nav class="toc">
+        <a href="#the-problem">The problem with AI coding</a>
+        <a href="#my-background">My background</a>
+        <a href="#altitude">Altitude</a>
+        <a href="#speed-mode">The birth of Speed Mode</a>
+        <a href="#the-method">The Jetty Method</a>
+      </nav>
+
+      <div class="next-link">
+        <a href="#">Next: Chapter 1 &rarr;</a>
+      </div>
+    </aside>
+
+    <main class="content">
+      <p class="chapter-intro">A guide to building software without an engineering background using the Jetty Method.</p>
+
+      <h2 id="the-problem"><a href="#the-problem" class="anchor">The problem with AI coding</a></h2>
+
+      <p>If you've tried to code with natural language through AI assistants, you've probably run into some common challenges:</p>
+
+      <div class="pain-points">
+        <ul>
+          <li>New features used to be a chat message away. Now simple improvements break old code.</li>
+          <li>You used to know exactly how your backend logic worked. Now you can't be 100% sure.</li>
+          <li>New functionality used to take minutes. Now you need an hour and 10x the tokens to make a button delete something.</li>
+        </ul>
+      </div>
+
+      <p>In my initial attempts to code a software product by myself as a non-engineer, I ran into these problems again and again.</p>
+
+      <h2 id="my-background"><a href="#my-background" class="anchor">My background</a></h2>
+
+      <div class="margin-note">
+        10 years in product management taught me how to build features the right way. Just not how to build them myself.
+      </div>
+
+      <p>My background wasn't completely useless. I had spent a lot of time around engineering as a 10 year veteran of product management at venture-funded startups. Part of what I did was help engineering teams build features the right way. In my world, the right way was a combination of principles and practices that outlined a combination of workflow frameworks.</p>
+
+      <p>When I first started to code with natural language at the end of 2024, I quickly realized that <span class="highlight">a new framework was needed</span> to deal with unique challenges that come with AI assistants and coding as someone with, previously, no business coding.</p>
+
+      <div class="divider">&#10022;</div>
+
+      <h2 id="altitude"><a href="#altitude" class="anchor">Altitude</a></h2>
+
+      <p>The first thing I built with my new AI superpowers was called Nearish. It tried to reimagine what an online profile could look like for small businesses hoping to connect with would-be local patrons in a more personal way. I had a lot of different profile ideas so I decided to build several versions, test each of them, and go with what worked.</p>
+
+      <div class="visual-break">
+        <div class="sketch">
+          <svg viewBox="0 0 400 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <text x="30" y="25" font-family="Caveat, cursive" font-size="16" fill="#666">Me: "Just build the prototype"</text>
+
+            <rect x="40" y="45" width="70" height="90" stroke="#2c2c2c" stroke-width="2" fill="none" rx="4"/>
+            <text x="55" y="95" font-family="Caveat, cursive" font-size="12" fill="#666">v1</text>
+
+            <rect x="130" y="45" width="70" height="90" stroke="#2c2c2c" stroke-width="2" fill="none" rx="4"/>
+            <text x="145" y="95" font-family="Caveat, cursive" font-size="12" fill="#666">v2</text>
+
+            <rect x="220" y="45" width="70" height="90" stroke="#2c2c2c" stroke-width="2" fill="none" rx="4"/>
+            <text x="235" y="95" font-family="Caveat, cursive" font-size="12" fill="#666">v3</text>
+
+            <ellipse cx="340" cy="90" rx="45" ry="55" stroke="#2c2c2c" stroke-width="2" fill="none"/>
+            <text x="315" y="75" font-family="Caveat, cursive" font-size="11" fill="#2c2c2c">But what</text>
+            <text x="315" y="90" font-family="Caveat, cursive" font-size="11" fill="#2c2c2c">about auth?</text>
+            <text x="315" y="105" font-family="Caveat, cursive" font-size="11" fill="#2c2c2c">And offline?</text>
+
+            <path d="M290 90 L300 85 L295 95 L305 90" stroke="#c00" stroke-width="2" fill="none"/>
+          </svg>
+          <div class="sketch-caption">AI kept solving problems I didn't have yet</div>
+        </div>
+      </div>
+
+      <p>Things started simply enough. But throughout prototyping, my AI assistant started to worry about challenges that I didn't care about yet. Who could access these pages? What could users do if they were offline? What should sections with no content look like?</p>
+
+      <h2 id="speed-mode"><a href="#speed-mode" class="anchor">The birth of Speed Mode</a></h2>
+
+      <div class="big-quote">
+        This is just a prototype.
+      </div>
+
+      <p>The number of times I'd say that became so frustrating that I unwittingly defined a set of temporary guidelines for my AI assistant that later became <span class="highlight">Speed Mode</span>&mdash;a cornerstone of the Jetty Method that you'll soon learn.</p>
+
+      <div class="margin-note">
+        Speed Mode: Build the happy path first. Worry about edge cases later.
+      </div>
+
+      <p>Project after project, I discovered more about what AI was inherently bad at in the context of traditional development methodologies. Most importantly, I learned the engineering pitfalls that I was particularly prone to as a non-engineer.</p>
+
+      <h2 id="the-method"><a href="#the-method" class="anchor">The Jetty Method</a></h2>
+
+      <p>The Jetty Method is the culmination of that learning, compiled for a new wave of non-technical Founders. It has helped me go from <span class="highlight">clueless vibe coder to shipping software projects</span> for clients that were scalable and maintainable.</p>
+    </main>
+  </div>
+</body>
+</html>
