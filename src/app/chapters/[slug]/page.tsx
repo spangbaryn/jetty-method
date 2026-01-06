@@ -31,6 +31,12 @@ const chapters: Record<string, {
         content: 'The method is built on three core principles: structured workflows, incremental delivery, and quality gates. Each principle reinforces the others to create a reliable development process.'
       }
     ]
+  },
+  // Test chapter for edge case: empty sections
+  'empty-test': {
+    title: 'Empty Test Chapter',
+    intro: 'This chapter has no sections for testing edge cases.',
+    sections: []
   }
 }
 
