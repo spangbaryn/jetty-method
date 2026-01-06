@@ -40,8 +40,20 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
 
   if (!chapter) {
     return (
-      <main className="min-h-screen p-8">
-        <h1 className="text-2xl font-bold">Chapter not found</h1>
+      <main className="min-h-screen max-w-3xl mx-auto px-8 py-12" data-testid="not-found-page">
+        <div className="text-center py-16">
+          <h1 className="text-3xl font-bold mb-4 font-serif">Chapter not found</h1>
+          <p className="text-gray-600 mb-8">
+            The chapter you&apos;re looking for doesn&apos;t exist or may have been moved.
+          </p>
+          <a
+            href="/"
+            className="inline-block px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-700 transition-colors"
+            data-testid="back-to-home"
+          >
+            Back to Home
+          </a>
+        </div>
       </main>
     )
   }
