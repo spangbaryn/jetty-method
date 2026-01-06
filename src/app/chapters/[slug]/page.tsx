@@ -55,7 +55,7 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
         {chapter.sections.map((section) => (
           <section key={section.id} className="mb-12">
             <SectionHeading id={section.id}>{section.title}</SectionHeading>
-            <p className="leading-relaxed font-serif">
+            <p className="leading-relaxed font-serif" data-testid="body-text">
               {section.content}
             </p>
           </section>
