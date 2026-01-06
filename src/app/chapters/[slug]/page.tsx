@@ -1,3 +1,5 @@
+import { ChapterTitle, ChapterIntro, SectionHeading } from '@/components/chapter'
+
 interface ChapterPageProps {
   params: Promise<{
     slug: string
@@ -47,26 +49,13 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
   return (
     <main className="min-h-screen max-w-3xl mx-auto px-8 py-12" data-testid="chapter-content">
       <article>
-        <h1 className="text-4xl font-bold mb-6" data-testid="chapter-title">
-          {chapter.title}
-        </h1>
-
-        <p className="text-xl italic text-gray-600 mb-12" data-testid="chapter-intro">
-          {chapter.intro}
-        </p>
+        <ChapterTitle>{chapter.title}</ChapterTitle>
+        <ChapterIntro>{chapter.intro}</ChapterIntro>
 
         {chapter.sections.map((section) => (
           <section key={section.id} className="mb-12">
-            <h2 id={section.id} className="text-2xl font-semibold mb-4">
-              <a
-                href={`#${section.id}`}
-                className="hover:underline"
-                data-testid="section-anchor"
-              >
-                {section.title}
-              </a>
-            </h2>
-            <p className="leading-relaxed">
+            <SectionHeading id={section.id}>{section.title}</SectionHeading>
+            <p className="leading-relaxed font-serif">
               {section.content}
             </p>
           </section>
