@@ -36,4 +36,23 @@ Scenario: Chapter uses correct typography
   And the text has proper line height for readability
 
 # SPEED MODE: All success scenarios above
-# STABLE MODE: Will add 404 handling, missing content, loading states
+
+# STABLE MODE SCENARIOS - Error Handling and Edge Cases
+
+Scenario: User navigates to non-existent chapter
+  Given the app is running
+  When I navigate to "/chapters/nonexistent-chapter"
+  Then I see a "Chapter not found" message
+  And the page displays a helpful navigation option
+
+Scenario: Chapter with empty sections displays gracefully
+  Given I am on a chapter page with no sections
+  Then I see the chapter title
+  And I see the chapter intro
+  And the page renders without errors
+
+Scenario: Chapter slug with special characters is handled
+  Given the app is running
+  When I navigate to "/chapters/chapter-with-special-chars-123"
+  Then either I see the chapter content or a not found message
+  And the page does not crash
