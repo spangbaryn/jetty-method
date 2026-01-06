@@ -30,9 +30,9 @@ Then('I see a {string} message', async function (message) {
 
 Then('the page displays a helpful navigation option', async function () {
   // Check for navigation links (home, back, etc.)
-  const navOptions = await this.page.locator('a[href="/"], a:has-text("home"), a:has-text("back"), button').count();
-  // At minimum, the page should have some navigation option
-  expect(navOptions).toBeGreaterThanOrEqual(0);
+  const navOptions = await this.page.locator('a[href="/"], a:has-text("Home"), a:has-text("Back"), [data-testid="back-to-home"]').count();
+  // Page must have at least one navigation option
+  expect(navOptions).toBeGreaterThanOrEqual(1);
 });
 
 // STABLE MODE STEPS - Empty Content Handling
