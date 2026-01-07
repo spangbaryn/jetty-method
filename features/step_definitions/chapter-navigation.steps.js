@@ -94,3 +94,36 @@ Then('the sidebar remains visible \\(sticky\\)', async function () {
   const isVisible = await sidebar.isVisible();
   expect(isVisible).toBe(true);
 });
+
+// STABLE MODE STEPS - Error Handling and Edge Cases
+
+const { Given } = require('@cucumber/cucumber');
+const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
+
+Given('I am on the last chapter page', async function () {
+  // empty-test is the last chapter in the list
+  await this.page.goto(`${BASE_URL}/chapters/empty-test`);
+  await expect(this.page.locator('main')).toBeVisible();
+});
+
+Then('I do not see a {string} link', async function (linkText) {
+  const link = await this.page.locator('[data-testid="next-chapter-link"]');
+  await expect(link).toHaveCount(0);
+});
+
+// Note: "I am on a chapter page with no sections" step is defined in chapter-layout-stable.steps.js
+
+Then('I do not see the section TOC', async function () {
+  const sectionToc = await this.page.locator('[data-testid="section-toc"]');
+  await expect(sectionToc).toHaveCount(0);
+});
+
+Then('all chapter links in the sidebar have visible text', async function () {
+  const links = await this.page.locator('[data-testid="chapter-list"] a').all();
+  expect(links.length).toBeGreaterThan(0);
+
+  for (const link of links) {
+    const text = await link.textContent();
+    expect(text.trim().length).toBeGreaterThan(0);
+  }
+});

@@ -43,5 +43,18 @@ Scenario: Sidebar remains visible while scrolling
   When I scroll down the page
   Then the sidebar remains visible (sticky)
 
-# SPEED MODE: All success scenarios above
-# STABLE MODE: Will add error handling (no chapters, last chapter has no next, etc.)
+# SPEED MODE: All success scenarios above (completed)
+
+# STABLE MODE SCENARIOS - Error Handling and Edge Cases
+
+Scenario: Last chapter does not show Next Chapter link
+  Given I am on the last chapter page
+  Then I do not see a "Next Chapter" link
+
+Scenario: Chapter with no sections hides section TOC
+  Given I am on a chapter page with no sections
+  Then I do not see the section TOC
+
+Scenario: Sidebar handles chapter with empty title gracefully
+  Given I am on the chapter page for "introduction"
+  Then all chapter links in the sidebar have visible text
