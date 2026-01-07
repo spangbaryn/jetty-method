@@ -8,6 +8,9 @@ let context;
 // Viewport sizes
 const MOBILE_VIEWPORT = { width: 375, height: 667 };  // iPhone SE
 const DESKTOP_VIEWPORT = { width: 1280, height: 800 };
+const VERY_NARROW_VIEWPORT = { width: 320, height: 568 };  // iPhone 5/SE (old)
+const TABLET_VIEWPORT = { width: 767, height: 1024 };  // iPad portrait (just below md: breakpoint)
+const LARGE_VIEWPORT = { width: 1920, height: 1080 };  // Full HD
 
 Before(async function () {
   const { chromium } = require('playwright');
@@ -152,4 +155,30 @@ Then('the content appears beside the sidebar', async function () {
 
   // They should be roughly at the same vertical level
   expect(Math.abs(sidebarBox.y - contentBox.y)).toBeLessThan(100);
+});
+
+// STABLE MODE - EDGE CASE VIEWPORT STEPS
+
+When('I view the page on a very narrow viewport', async function () {
+  await page.setViewportSize(VERY_NARROW_VIEWPORT);
+  await page.waitForTimeout(100);
+});
+
+When('I view the page on a tablet viewport', async function () {
+  await page.setViewportSize(TABLET_VIEWPORT);
+  await page.waitForTimeout(100);
+});
+
+When('I view the page on a large viewport', async function () {
+  await page.setViewportSize(LARGE_VIEWPORT);
+  await page.waitForTimeout(100);
+});
+
+Then('the content width is constrained', async function () {
+  const container = page.locator('.max-w-5xl').first();
+  const containerBox = await container.boundingBox();
+
+  // max-w-5xl = 64rem = 1024px max width
+  // Content should be constrained even on large viewport
+  expect(containerBox.width).toBeLessThanOrEqual(1024);
 });
