@@ -22,7 +22,7 @@ export function ChapterSidebar({ bookTitle, currentSlug, chapters, sections, nex
   return (
     <aside
       data-testid="chapter-sidebar"
-      className="w-64 shrink-0 sticky top-0 h-screen overflow-y-auto py-12 pr-8"
+      className="w-full md:w-64 shrink-0 md:sticky md:top-0 md:h-screen overflow-y-auto p-6 md:py-12 md:pr-8 border-b md:border-b-0 border-gray-200"
     >
       <h2
         data-testid="sidebar-book-title"
