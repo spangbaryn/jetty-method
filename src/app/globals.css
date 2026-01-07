@@ -9,7 +9,7 @@
     --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
     /* shadcn/ui colors */
-    --background: 0 0% 100%;
+    --background: 50 100% 98.8%; /* cream #fffef9 */
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;

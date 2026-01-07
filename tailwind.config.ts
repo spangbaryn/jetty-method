@@ -12,6 +12,7 @@ const config: Config = {
       fontFamily: {
         serif: ['Georgia', 'Times New Roman', 'serif'],
         sans: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        caveat: ['var(--font-caveat)', 'cursive'],
       },
       typography: {
         DEFAULT: {
