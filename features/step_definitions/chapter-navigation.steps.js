@@ -1,23 +1,8 @@
-const { Given, When, Then, Before, After } = require('@cucumber/cucumber');
-const { chromium, expect } = require('@playwright/test');
-
-const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
-
-let browser;
-let context;
-
-Before(async function () {
-  browser = await chromium.launch();
-  context = await browser.newContext();
-  this.page = await context.newPage();
-});
-
-After(async function () {
-  await context?.close();
-  await browser?.close();
-});
+const { When, Then } = require('@cucumber/cucumber');
+const { expect } = require('@playwright/test');
 
 // INTEGRATION SCENARIO STEPS
+// Note: Browser setup is handled by chapter-layout.steps.js
 
 Then('I see the navigation sidebar', async function () {
   const sidebar = await this.page.locator('[data-testid="chapter-sidebar"]');

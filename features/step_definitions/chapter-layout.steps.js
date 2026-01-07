@@ -10,6 +10,7 @@ Before(async function () {
   browser = await chromium.launch();
   context = await browser.newContext();
   page = await context.newPage();
+  this.page = page;  // Share with other step definition files
 });
 
 After(async function () {
