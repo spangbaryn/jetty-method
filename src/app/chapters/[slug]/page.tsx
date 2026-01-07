@@ -1,4 +1,6 @@
-import { ChapterTitle, ChapterIntro, SectionHeading } from '@/components/chapter'
+import { ChapterTitle, ChapterIntro, SectionHeading, ChapterSidebar } from '@/components/chapter'
+
+const BOOK_TITLE = 'The Jetty Method'
 
 interface ChapterPageProps {
   params: Promise<{
@@ -65,21 +67,24 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
   }
 
   return (
-    <main className="min-h-screen max-w-3xl mx-auto px-8 py-12" data-testid="chapter-content">
-      <article>
-        <ChapterTitle>{chapter.title}</ChapterTitle>
-        <ChapterIntro>{chapter.intro}</ChapterIntro>
+    <div className="min-h-screen flex max-w-5xl mx-auto px-8">
+      <ChapterSidebar bookTitle={BOOK_TITLE} currentSlug={slug} />
+      <main className="flex-1 py-12 pl-8" data-testid="chapter-content">
+        <article>
+          <ChapterTitle>{chapter.title}</ChapterTitle>
+          <ChapterIntro>{chapter.intro}</ChapterIntro>
 
-        {chapter.sections.map((section) => (
-          <section key={section.id} className="mb-12">
-            <SectionHeading id={section.id}>{section.title}</SectionHeading>
-            <p className="leading-relaxed font-serif" data-testid="body-text">
-              {section.content}
-            </p>
-          </section>
-        ))}
-      </article>
-    </main>
+          {chapter.sections.map((section) => (
+            <section key={section.id} className="mb-12">
+              <SectionHeading id={section.id}>{section.title}</SectionHeading>
+              <p className="leading-relaxed font-serif" data-testid="body-text">
+                {section.content}
+              </p>
+            </section>
+          ))}
+        </article>
+      </main>
+    </div>
   )
 }
 
