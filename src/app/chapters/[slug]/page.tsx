@@ -67,14 +67,32 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
   }
 
   // Build chapter list for sidebar
-  const chapterList = Object.entries(chapters).map(([slug, chapter]) => ({
-    slug,
-    title: chapter.title,
+  const chapterSlugs = Object.keys(chapters)
+  const chapterList = chapterSlugs.map((s) => ({
+    slug: s,
+    title: chapters[s].title,
   }))
+
+  // Get sections for current chapter TOC
+  const sectionList = chapter.sections.map((s) => ({
+    id: s.id,
+    title: s.title,
+  }))
+
+  // Find next chapter
+  const currentIndex = chapterSlugs.indexOf(slug)
+  const nextSlug = chapterSlugs[currentIndex + 1]
+  const nextChapter = nextSlug ? { slug: nextSlug, title: chapters[nextSlug].title } : null
 
   return (
     <div className="min-h-screen flex max-w-5xl mx-auto px-8">
-      <ChapterSidebar bookTitle={BOOK_TITLE} currentSlug={slug} chapters={chapterList} />
+      <ChapterSidebar
+        bookTitle={BOOK_TITLE}
+        currentSlug={slug}
+        chapters={chapterList}
+        sections={sectionList}
+        nextChapter={nextChapter}
+      />
       <main className="flex-1 py-12 pl-8" data-testid="chapter-content">
         <article>
           <ChapterTitle>{chapter.title}</ChapterTitle>
