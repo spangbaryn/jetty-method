@@ -1,0 +1,6 @@
+export { Highlight } from './Highlight'
+export { MarginNote } from './MarginNote'
+export { Sketch } from './Sketch'
+export { PainPoints, PainPointItem } from './PainPoints'
+export { BigQuote } from './BigQuote'
+export { Divider } from './Divider'
