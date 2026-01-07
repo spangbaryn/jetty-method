@@ -47,3 +47,12 @@
 nav, button, input, select, textarea, .ui-element {
   font-family: var(--font-sans);
 }
+
+/* Section headers with left border accent */
+h2 {
+  font-size: 1.75rem;
+  font-weight: 400;
+  margin: 3rem 0 1.5rem;
+  padding-left: 1.25rem;
+  border-left: 4px solid #2c2c2c;
+}
