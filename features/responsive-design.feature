@@ -33,3 +33,22 @@ Feature: Responsive Design
     When I view the page on a desktop viewport
     Then the sidebar is fixed on the left
     And the content appears beside the sidebar
+
+  # STABLE MODE SCENARIOS - Edge Cases
+  Scenario: Very narrow viewport still readable
+    Given I am on the introduction chapter
+    When I view the page on a very narrow viewport
+    Then no horizontal scrolling is required
+    And the body text has appropriate padding
+
+  Scenario: Tablet viewport uses mobile layout
+    Given I am on the introduction chapter
+    When I view the page on a tablet viewport
+    Then the sidebar appears above the main content
+    And the layout is single-column
+
+  Scenario: Large viewport is constrained
+    Given I am on the introduction chapter
+    When I view the page on a large viewport
+    Then the content width is constrained
+    And the sidebar is fixed on the left
