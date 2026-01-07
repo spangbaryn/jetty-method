@@ -6,7 +6,7 @@ interface PainPointsProps {
 
 export function PainPoints({ children }: PainPointsProps) {
   return (
-    <div className="bg-white border-2 border-[#2c2c2c] rounded-lg py-7 px-9 my-8 relative">
+    <div className="pain-points bg-white border-2 border-[#2c2c2c] rounded-lg py-7 px-9 my-8 relative" data-testid="pain-points">
       <span
         className="font-caveat text-base text-[#666] absolute -top-3 left-5 bg-background px-2"
       >

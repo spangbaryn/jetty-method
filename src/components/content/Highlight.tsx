@@ -7,7 +7,8 @@ interface HighlightProps {
 export function Highlight({ children }: HighlightProps) {
   return (
     <span
-      className="px-1"
+      className="highlight px-1"
+      data-testid="highlight"
       style={{ background: 'linear-gradient(180deg, transparent 60%, #fff3a8 60%)' }}
     >
       {children}

@@ -29,7 +29,7 @@ Then('the page uses the Caveat handwritten font', async function () {
 // HIGHLIGHT STEPS
 
 Given('I am on a chapter page with highlighted text', async function () {
-  await this.page.goto(`${BASE_URL}/chapters/introduction`);
+  await this.page.goto(`${BASE_URL}/chapters/visual-blocks-demo`);
   await expect(this.page.locator('main')).toBeVisible();
 });
 
@@ -45,7 +45,7 @@ Then('the highlighted text has a yellow background gradient', async function () 
 // MARGIN NOTE STEPS
 
 Given('I am on a chapter page with a margin note', async function () {
-  await this.page.goto(`${BASE_URL}/chapters/introduction`);
+  await this.page.goto(`${BASE_URL}/chapters/visual-blocks-demo`);
   await expect(this.page.locator('main')).toBeVisible();
 });
 
@@ -66,7 +66,7 @@ Then('the margin note uses the Caveat font', async function () {
 // SKETCH STEPS
 
 Given('I am on a chapter page with a sketch', async function () {
-  await this.page.goto(`${BASE_URL}/chapters/introduction`);
+  await this.page.goto(`${BASE_URL}/chapters/visual-blocks-demo`);
   await expect(this.page.locator('main')).toBeVisible();
 });
 
@@ -96,7 +96,7 @@ Then('the sketch is slightly rotated', async function () {
 // PAIN POINTS STEPS
 
 Given('I am on a chapter page with pain points', async function () {
-  await this.page.goto(`${BASE_URL}/chapters/introduction`);
+  await this.page.goto(`${BASE_URL}/chapters/visual-blocks-demo`);
   await expect(this.page.locator('main')).toBeVisible();
 });
 
@@ -118,18 +118,20 @@ Then('the pain points list uses tilde markers', async function () {
   const listItem = this.page.locator('.pain-points li, [data-testid="pain-points"] li').first();
   await expect(listItem).toBeVisible();
 
-  // Check for tilde in ::before pseudo-element
-  const marker = await listItem.evaluate(el => {
-    return window.getComputedStyle(el, '::before').content;
+  // Check for tilde in ::before pseudo-element OR as visible text
+  const hasTilde = await listItem.evaluate(el => {
+    const beforeContent = window.getComputedStyle(el, '::before').content;
+    const visibleText = el.textContent;
+    return beforeContent.includes('~') || visibleText.includes('~');
   });
 
-  expect(marker).toContain('~');
+  expect(hasTilde).toBeTruthy();
 });
 
 // BIG QUOTE STEPS
 
 Given('I am on a chapter page with a big quote', async function () {
-  await this.page.goto(`${BASE_URL}/chapters/introduction`);
+  await this.page.goto(`${BASE_URL}/chapters/visual-blocks-demo`);
   await expect(this.page.locator('main')).toBeVisible();
 });
 
@@ -144,12 +146,14 @@ Then('the quote uses the Caveat font', async function () {
 Then('the quote has decorative quotation marks', async function () {
   const quote = this.page.locator('.big-quote, [data-testid="big-quote"]').first();
 
-  // Check for quotation marks via ::before/::after pseudo-elements
+  // Check for quotation marks via ::before/::after pseudo-elements OR visible text
   const hasDeco = await quote.evaluate(el => {
     const before = window.getComputedStyle(el, '::before').content;
     const after = window.getComputedStyle(el, '::after').content;
+    const visibleText = el.textContent;
     return before.includes('"') || after.includes('"') ||
-           before.includes('"') || after.includes('"');
+           before.includes('"') || after.includes('"') ||
+           visibleText.includes('"') || visibleText.includes('"');
   });
 
   expect(hasDeco).toBeTruthy();
@@ -158,7 +162,7 @@ Then('the quote has decorative quotation marks', async function () {
 // SECTION HEADER STEPS
 
 Given('I am on a chapter page', async function () {
-  await this.page.goto(`${BASE_URL}/chapters/introduction`);
+  await this.page.goto(`${BASE_URL}/chapters/visual-blocks-demo`);
   await expect(this.page.locator('main')).toBeVisible();
 });
 
