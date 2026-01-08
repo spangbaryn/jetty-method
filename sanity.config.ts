@@ -8,9 +8,8 @@ export default defineConfig({
   name: 'jetty-method',
   title: 'Jetty Method',
 
-  // TODO: Replace with your Sanity project ID and dataset
-  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'your-project-id',
-  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
+  projectId: 's2c00hdo',
+  dataset: 'production',
 
   plugins: [
     structureTool({ structure }),
