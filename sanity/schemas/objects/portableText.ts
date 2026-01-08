@@ -1,11 +1,12 @@
 import { defineType, defineArrayMember } from 'sanity'
+import { HighlightInput } from '../components/inputs/HighlightInput'
 
 /**
  * Custom Portable Text configuration
  *
  * Features:
  * - Standard block formatting (headings, paragraphs)
- * - Inline annotations: highlight (marks text with yellow background)
+ * - Inline annotations: highlight (marks text with color swatches)
  * - Block types: sketch, bigQuote, painPoints, marginNote, divider
  */
 export const portableText = defineType({
@@ -45,7 +46,7 @@ export const portableText = defineType({
               },
             ],
           },
-          // Custom: Highlight annotation (inline)
+          // Custom: Highlight annotation (inline) with color swatch input
           {
             name: 'highlight',
             type: 'object',
@@ -57,6 +58,9 @@ export const portableText = defineType({
                 type: 'string',
                 title: 'Style',
                 initialValue: 'yellow',
+                components: {
+                  input: HighlightInput,
+                },
                 options: {
                   list: [
                     { title: 'Yellow', value: 'yellow' },
