@@ -1,4 +1,5 @@
 import { defineType, defineField } from 'sanity'
+import { PainPointsPreview } from '../../components/previews/PainPointsPreview'
 
 /**
  * PainPoints block - List with "Sound familiar?" label
@@ -11,6 +12,9 @@ export const painPoints = defineType({
   title: 'Pain Points',
   type: 'object',
   icon: () => '😫',
+  components: {
+    preview: PainPointsPreview,
+  },
   fields: [
     defineField({
       name: 'label',

@@ -1,4 +1,5 @@
 import { defineType, defineField } from 'sanity'
+import { MarginNotePreview } from '../../components/previews/MarginNotePreview'
 
 /**
  * MarginNote block - Sidebar callout with handwritten style
@@ -11,6 +12,9 @@ export const marginNote = defineType({
   title: 'Margin Note',
   type: 'object',
   icon: () => '📝',
+  components: {
+    preview: MarginNotePreview,
+  },
   fields: [
     defineField({
       name: 'content',
