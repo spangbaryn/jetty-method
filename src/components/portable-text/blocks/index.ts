@@ -1,0 +1,6 @@
+export { BigQuote } from './BigQuote'
+export { Divider } from './Divider'
+export { Highlight } from './Highlight'
+export { MarginNote } from './MarginNote'
+export { PainPoints } from './PainPoints'
+export { Sketch } from './Sketch'
