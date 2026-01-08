@@ -65,4 +65,37 @@ Scenario: MarginNote block has content field
   Then it has a "content" field of type "text"
 
 # SPEED MODE: All schema validation scenarios above
-# STABLE MODE: Will add error handling for missing schemas, invalid content
+
+# ============================================================
+# STABLE MODE SCENARIOS - Error Handling and Edge Cases
+# ============================================================
+
+Scenario: Schema validation detects missing name property
+  Given a schema object without a name property
+  When the schema is validated
+  Then a validation error is reported for missing name
+
+Scenario: Schema validation detects missing type property
+  Given a schema object without a type property
+  When the schema is validated
+  Then a validation error is reported for missing type
+
+Scenario: Schema validation handles empty fields array
+  Given a schema with an empty fields array
+  When the schema fields are checked
+  Then no field lookup errors occur
+
+Scenario: Field lookup returns undefined for non-existent field
+  Given a chapter schema definition
+  When I look up a field named "nonexistent"
+  Then the field lookup returns undefined
+
+Scenario: Block type lookup returns undefined for non-existent block
+  Given a portableText schema definition
+  When I look up a block type named "nonexistent"
+  Then the block type lookup returns undefined
+
+Scenario: Annotation lookup returns undefined for non-existent annotation
+  Given a portableText schema definition
+  When I look up an annotation named "nonexistent"
+  Then the annotation lookup returns undefined
