@@ -2,21 +2,25 @@ const { Given, When, Then, Before, After } = require('@cucumber/cucumber');
 const { expect } = require('@playwright/test');
 const { execSync } = require('child_process');
 
-let page;
 let browser;
-let context;
 let currentChapterSlug;
 
 Before(async function () {
-  const { chromium } = require('playwright');
-  browser = await chromium.launch();
-  context = await browser.newContext();
-  page = await context.newPage();
-  this.page = page;
+  // Only create browser if not already created by another step file
+  if (!this.browser) {
+    const { chromium } = require('playwright');
+    this.browser = await chromium.launch();
+    this.context = await this.browser.newContext();
+    this.page = await this.context.newPage();
+  }
+  browser = this.browser;
 });
 
 After(async function () {
-  await browser.close();
+  if (this.browser) {
+    await this.browser.close();
+    this.browser = null;
+  }
 });
 
 const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
@@ -34,7 +38,7 @@ Given('a chapter {string} exists in Sanity', async function (slug) {
 
 Then('I see the chapter title from Sanity', async function () {
   // Title should be visible and not be placeholder/hardcoded text
-  const title = page.locator('h1');
+  const title = this.page.locator('h1');
   await expect(title).toBeVisible();
   const text = await title.textContent();
   expect(text.length).toBeGreaterThan(0);
@@ -42,7 +46,7 @@ Then('I see the chapter title from Sanity', async function () {
 
 Then('I see the chapter introduction text', async function () {
   // Intro paragraph should be visible
-  const intro = page.locator('.chapter-intro, [class*="intro"], main p').first();
+  const intro = this.page.locator('.chapter-intro, [class*="intro"], main p').first();
   await expect(intro).toBeVisible();
 });
 
@@ -54,28 +58,28 @@ Given('a chapter with rich text content exists in Sanity', async function () {
 });
 
 When('I view that chapter page', async function () {
-  await page.goto(`${BASE_URL}/chapters/${currentChapterSlug}`);
-  await expect(page.locator('main')).toBeVisible();
+  await this.page.goto(`${BASE_URL}/chapters/${currentChapterSlug}`);
+  await expect(this.page.locator('main')).toBeVisible();
 });
 
 Then('I see formatted text with headings', async function () {
   // Check for h2 or h3 within content
-  const headings = page.locator('main h2, main h3');
+  const headings = this.page.locator('main h2, main h3');
   const count = await headings.count();
   expect(count).toBeGreaterThan(0);
 });
 
 Then('I see styled block quotes', async function () {
   // Check for blockquote elements
-  const quotes = page.locator('main blockquote, [class*="quote"]');
+  const quotes = this.page.locator('main blockquote, [class*="quote"]');
   // May or may not have quotes - just verify no error
-  await page.waitForTimeout(100);
+  await this.page.waitForTimeout(100);
 });
 
 Then('I see custom blocks rendered correctly', async function () {
   // Custom blocks like BigQuote, MarginNote, PainPoint
   // Check that content area exists without errors
-  const main = page.locator('main');
+  const main = this.page.locator('main');
   await expect(main).toBeVisible();
 });
 
@@ -93,8 +97,8 @@ When('Next.js builds the site', async function () {
 Then('static pages are generated for each chapter slug', async function () {
   // Verify we can navigate to a chapter page
   // In production, this proves generateStaticParams worked
-  await page.goto(`${BASE_URL}/chapters/introduction`);
-  await expect(page.locator('main')).toBeVisible();
+  await this.page.goto(`${BASE_URL}/chapters/introduction`);
+  await expect(this.page.locator('main')).toBeVisible();
 });
 
 // SECTIONS SCENARIO STEPS
@@ -105,14 +109,14 @@ Given('a chapter with multiple sections exists in Sanity', async function () {
 
 Then('I see all sections in order', async function () {
   // Sections should appear in document order
-  const sections = page.locator('main section, main [class*="section"]');
+  const sections = this.page.locator('main section, main [class*="section"]');
   // Even if no explicit section tags, content should be visible
-  await expect(page.locator('main')).toBeVisible();
+  await expect(this.page.locator('main')).toBeVisible();
 });
 
 Then('each section displays its title and content', async function () {
   // Section headings and their content should be visible
-  const main = page.locator('main');
+  const main = this.page.locator('main');
   await expect(main).toBeVisible();
   const content = await main.textContent();
   expect(content.length).toBeGreaterThan(100); // Has meaningful content
