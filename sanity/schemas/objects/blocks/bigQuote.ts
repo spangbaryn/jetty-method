@@ -1,4 +1,5 @@
 import { defineType, defineField } from 'sanity'
+import { BigQuotePreview } from '../../components/previews/BigQuotePreview'
 
 /**
  * BigQuote block - Large decorative block quote
@@ -11,6 +12,9 @@ export const bigQuote = defineType({
   title: 'Big Quote',
   type: 'object',
   icon: () => '💬',
+  components: {
+    preview: BigQuotePreview,
+  },
   fields: [
     defineField({
       name: 'text',
