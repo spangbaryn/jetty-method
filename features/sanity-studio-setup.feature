@@ -44,4 +44,23 @@ Scenario: Highlight annotation shows color options visually
   Then I see color swatches for yellow, green, and blue
 
 # SPEED MODE: All success scenarios above
-# STABLE MODE: Will add error handling, fallbacks for missing previews
+
+# =====================================================
+# STABLE MODE SCENARIOS - Error Handling and Edge Cases
+# =====================================================
+
+# CONFIGURATION VALIDATION
+Scenario: Studio shows fallback when desk structure file is missing
+  Given I have a sanity.config.ts without custom structure import
+  Then the Studio should use default desk structure
+  And I should not see any console errors
+
+Scenario: Preview component gracefully handles missing data
+  Given I have a bigQuote block without content
+  Then the preview should show placeholder text
+  And the preview should not throw an error
+
+Scenario: Highlight input maintains state when color is undefined
+  Given I have a highlight annotation without style set
+  Then the input should default to yellow
+  And I should see all color swatches enabled
