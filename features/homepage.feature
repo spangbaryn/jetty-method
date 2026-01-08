@@ -31,4 +31,21 @@ Scenario: User navigates to a chapter from homepage
   Then I am taken to that chapter's page
 
 # SPEED MODE: All success scenarios above
-# STABLE MODE: Will add error handling, empty states, edge cases
+
+# STABLE MODE: Edge cases and error handling
+Scenario: Homepage handles long chapter titles gracefully
+  Given I am on the homepage
+  Then chapter titles do not overflow their containers
+  And the layout remains intact
+
+Scenario: Homepage is keyboard navigable
+  Given I am on the homepage
+  When I navigate using the Tab key
+  Then I can reach all chapter links
+  And each link has visible focus styling
+
+Scenario: Homepage remains usable at narrow viewport
+  Given I am on the homepage
+  And the viewport width is 320 pixels
+  Then the table of contents is still readable
+  And chapter links are still clickable
