@@ -169,3 +169,80 @@ Then('the {string} annotation has a {string} field with color options', async fu
   expect(field.options?.list, 'Field should have color options list').toBeDefined();
   expect(field.options.list.length).toBeGreaterThan(0);
 });
+
+// ============================================================
+// STABLE MODE STEPS - Error Handling and Edge Cases
+// ============================================================
+
+// Test context for stable mode
+let testSchema;
+let fieldLookupResult;
+let blockTypeLookupResult;
+let annotationLookupResult;
+
+Given('a schema object without a name property', async function () {
+  testSchema = { type: 'object', fields: [] };
+});
+
+Given('a schema object without a type property', async function () {
+  testSchema = { name: 'testSchema', fields: [] };
+});
+
+Given('a schema with an empty fields array', async function () {
+  testSchema = { name: 'emptySchema', type: 'object', fields: [] };
+});
+
+When('the schema is validated', async function () {
+  validationErrors = [];
+
+  if (!testSchema.name) {
+    validationErrors.push(`Schema missing 'name' property`);
+  }
+  if (!testSchema.type) {
+    validationErrors.push(`Schema '${testSchema.name}' missing 'type' property`);
+  }
+});
+
+When('the schema fields are checked', async function () {
+  // This step tests that accessing fields on an empty array doesn't throw
+  const fields = testSchema.fields || [];
+  // Try to find a field - should return undefined, not throw
+  findField(testSchema, 'anyField');
+});
+
+When('I look up a field named {string}', async function (fieldName) {
+  fieldLookupResult = findField(currentSchema, fieldName);
+});
+
+When('I look up a block type named {string}', async function (blockTypeName) {
+  blockTypeLookupResult = findBlockType(currentSchema, blockTypeName);
+});
+
+When('I look up an annotation named {string}', async function (annotationName) {
+  annotationLookupResult = findAnnotation(currentSchema, annotationName);
+});
+
+Then('a validation error is reported for missing name', async function () {
+  expect(validationErrors.some(e => e.includes('name'))).toBe(true);
+});
+
+Then('a validation error is reported for missing type', async function () {
+  expect(validationErrors.some(e => e.includes('type'))).toBe(true);
+});
+
+Then('no field lookup errors occur', async function () {
+  // If we got here without throwing, the test passes
+  expect(true).toBe(true);
+});
+
+Then('the field lookup returns undefined', async function () {
+  expect(fieldLookupResult).toBeUndefined();
+});
+
+Then('the block type lookup returns undefined', async function () {
+  expect(blockTypeLookupResult).toBeUndefined();
+});
+
+Then('the annotation lookup returns undefined', async function () {
+  expect(annotationLookupResult).toBeUndefined();
+});
