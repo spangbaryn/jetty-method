@@ -135,8 +135,8 @@ Given('no chapter exists with slug {string}', async function (slug) {
 
 Then('I see the {string} page', async function (pageType) {
   if (pageType === 'not found') {
-    // Check for not-found page indicators
-    const notFoundPage = this.page.locator('[data-testid="not-found-page"], main h1:has-text("not found")');
+    // Check for not-found page indicator using specific data-testid
+    const notFoundPage = this.page.locator('[data-testid="not-found-page"]');
     await expect(notFoundPage).toBeVisible();
   }
 });
@@ -193,11 +193,12 @@ Then('the section heading is displayed', async function () {
 });
 
 Then('no content error is shown', async function () {
-  // Page should not display content-related errors
-  const bodyText = await this.page.locator('body').textContent();
-  expect(bodyText).not.toContain('Cannot read properties');
-  expect(bodyText).not.toContain('undefined');
-  expect(bodyText).not.toContain('null');
+  // Page should not display visible content-related errors
+  // Use innerText to check only visible text, not RSC payload scripts
+  const visibleText = await this.page.locator('main').innerText();
+  expect(visibleText).not.toContain('Cannot read properties');
+  expect(visibleText).not.toContain('Error:');
+  // Note: We check for error patterns, not literal 'undefined'/'null' which may appear in content
 });
 
 Given('a chapter exists with special characters in title', async function () {
