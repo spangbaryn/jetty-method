@@ -59,10 +59,10 @@ export default function Home() {
             </h3>
             <ul className="space-y-3 pl-4">
               {part.chapters.map((chapter) => (
-                <li key={chapter.slug} data-testid="toc-chapter">
+                <li key={chapter.slug} data-testid="toc-chapter" className="overflow-hidden">
                   <Link
                     href={`/chapters/${chapter.slug}`}
-                    className="text-xl font-serif text-gray-800 hover:text-blue-600 hover:underline transition-colors"
+                    className="text-xl font-serif text-gray-800 hover:text-blue-600 hover:underline transition-colors block truncate focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded"
                   >
                     {chapter.title}
                   </Link>
