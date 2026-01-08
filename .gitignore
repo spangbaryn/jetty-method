@@ -15,6 +15,9 @@ node_modules/
 .next/
 out/
 
+# Sanity
+.sanity/
+
 # Build
 build/
 dist/
