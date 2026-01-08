@@ -33,20 +33,16 @@ function findAnnotation(schema, annotationName) {
 // INTEGRATION SCENARIO STEPS
 
 Given('the Sanity schema configuration exists', async function () {
-  // Import schema types from the prototype location (will be moved to sanity/ in implementation)
-  const schemaPath = path.resolve(__dirname, '../../sanity/schemas/index');
+  // Import schema data (plain JS objects for testing without Sanity runtime dependencies)
+  const schemaDataPath = path.resolve(__dirname, '../../sanity/schemas/schema-data.js');
 
   try {
-    const schemaModule = require(schemaPath);
+    const schemaModule = require(schemaDataPath);
     schemaTypes = schemaModule.schemaTypes;
     expect(schemaTypes).toBeDefined();
     expect(Array.isArray(schemaTypes)).toBe(true);
   } catch (error) {
-    // If sanity/schemas doesn't exist yet, check prototype location
-    const prototypePath = path.resolve(__dirname, '../../prototypes/feature-26-hybrid-schema/schemas/index');
-    const schemaModule = require(prototypePath);
-    schemaTypes = schemaModule.schemaTypes;
-    expect(schemaTypes).toBeDefined();
+    throw new Error(`Failed to load Sanity schemas: ${error.message}`);
   }
 });
 
