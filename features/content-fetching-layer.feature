@@ -35,4 +35,45 @@ Scenario: Chapter sections are fetched and rendered
   And each section displays its title and content
 
 # SPEED MODE: All success scenarios above
-# STABLE MODE: Will add error handling (missing chapters, failed queries, invalid content)
+
+# ============================================================================
+# STABLE MODE SCENARIOS - Error Handling and Edge Cases
+# ============================================================================
+
+# ERROR SCENARIOS
+Scenario: User navigates to non-existent chapter
+  Given no chapter exists with slug "fake-chapter"
+  When I navigate to "/chapters/fake-chapter"
+  Then I see the "not found" page
+  And the page displays a helpful error message
+  And I see a link to return home
+
+Scenario: Chapter page handles missing sections gracefully
+  Given a chapter exists with no sections
+  When I view that chapter page
+  Then I see the chapter title
+  And the page renders without errors
+  And no section elements are displayed
+
+Scenario: Chapter page handles missing intro gracefully
+  Given a chapter exists without an intro paragraph
+  When I view that chapter page
+  Then I see the chapter title
+  And the page renders without errors
+
+# EDGE CASE SCENARIOS
+Scenario: Portable Text handles empty content array
+  Given a chapter section has empty content
+  When I view that chapter page
+  Then the section heading is displayed
+  And no content error is shown
+
+Scenario: Chapter page handles special characters in slug
+  Given a chapter exists with special characters in title
+  When I navigate to that chapter's URL
+  Then the page loads correctly
+
+Scenario: Section anchors handle duplicate headings
+  Given a chapter has multiple sections with similar headings
+  When I view that chapter page
+  Then each section has a unique anchor ID
