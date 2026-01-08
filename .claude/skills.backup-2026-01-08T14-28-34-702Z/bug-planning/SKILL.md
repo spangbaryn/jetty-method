@@ -17,6 +17,25 @@ description: Guide structured bug investigation with symptom capture, hypothesis
 
 Guides Claude through systematic bug investigation. Produces a bug work item with clear breadcrumbs for implementation.
 
+## ⚠️ READ-ONLY PHASE
+
+**This skill is an investigation phase. No worktree exists yet.**
+
+🚫 **FORBIDDEN during this skill:**
+- Writing or editing any code files
+- Creating new files
+- Making implementation changes
+- Adding temporary debugging code
+
+✅ **ALLOWED during this skill:**
+- Reading files to understand the codebase
+- Running `jettypod` commands to create work items
+- Running diagnostic commands (git log, grep, etc.)
+- Asking the user questions
+- Analyzing symptoms and forming hypotheses
+
+**The worktree is created in Phase 6** when `jettypod work start` runs before invoking bug-mode.
+
 ## Instructions
 
 When this skill is activated, you are investigating a bug to identify root cause and plan the fix.

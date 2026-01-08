@@ -7,6 +7,23 @@ description: Guide epic planning with feature brainstorming and optional archite
 
 Guides Claude through comprehensive epic planning including feature identification and architectural decisions. For **technical epics**, skips feature brainstorming and creates chores directly.
 
+## ⚠️ READ-ONLY PHASE
+
+**This skill is a planning/investigation phase. No worktree exists yet.**
+
+🚫 **FORBIDDEN during this skill:**
+- Writing or editing any code files
+- Creating new files
+- Making implementation changes
+
+✅ **ALLOWED during this skill:**
+- Reading files to understand the codebase
+- Running `jettypod` commands to create work items
+- Asking the user questions
+- Analyzing and planning
+
+**The worktree is created later** when a mode skill (speed-mode, chore-mode, etc.) runs `jettypod work start`.
+
 ## Instructions
 
 When this skill is activated, you are helping plan an epic. Follow this structured approach:

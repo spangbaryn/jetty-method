@@ -7,6 +7,23 @@ description: Guide standalone chore planning with automatic type classification 
 
 Guides Claude through standalone chore planning including automatic type classification, loading type-specific guidance from the taxonomy, building enriched context, and routing to chore-mode for execution. For chores under **technical epics**, detects this ancestry and passes context to skip mode progression.
 
+## ⚠️ READ-ONLY PHASE
+
+**This skill is a planning/investigation phase. No worktree exists yet.**
+
+🚫 **FORBIDDEN during this skill:**
+- Writing or editing any code files
+- Creating new files
+- Making implementation changes
+
+✅ **ALLOWED during this skill:**
+- Reading files to understand the codebase
+- Running `jettypod` commands to create work items
+- Asking the user questions
+- Analyzing and planning
+
+**The worktree is created later** when chore-mode runs `jettypod work start`.
+
 ## Instructions
 
 When this skill is activated, you are helping plan a standalone chore (one without a parent feature). Follow this structured approach:
