@@ -27,7 +27,7 @@ export function ChapterSidebar({ bookTitle, currentSlug, chapters, sections, nex
       <a
         href="/"
         data-testid="sidebar-book-title"
-        className="inline-flex items-center gap-2.5 font-caveat text-2xl text-white bg-[#2c2c2c] px-5 py-3 rounded-lg no-underline mb-10"
+        className="inline-flex items-center gap-2.5 font-caveat text-2xl text-white bg-[#2c2c2c] px-5 py-3 rounded-lg no-underline mb-10 whitespace-nowrap"
       >
         <span className="text-lg">☰</span>
         {bookTitle}
