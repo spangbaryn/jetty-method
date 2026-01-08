@@ -24,12 +24,14 @@ export function ChapterSidebar({ bookTitle, currentSlug, chapters, sections, nex
       data-testid="chapter-sidebar"
       className="w-full md:w-64 shrink-0 md:sticky md:top-0 md:h-screen overflow-y-auto p-6 md:py-12 md:pr-8 border-b md:border-b-0 border-gray-200"
     >
-      <h2
+      <a
+        href="/"
         data-testid="sidebar-book-title"
-        className="font-serif text-lg font-bold mb-6"
+        className="inline-flex items-center gap-2.5 font-caveat text-2xl text-white bg-[#2c2c2c] px-5 py-3 rounded-lg no-underline mb-10"
       >
+        <span className="text-lg">☰</span>
         {bookTitle}
-      </h2>
+      </a>
 
       <nav data-testid="chapter-list">
         <ul className="space-y-2">
