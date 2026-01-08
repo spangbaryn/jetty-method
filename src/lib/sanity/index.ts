@@ -6,3 +6,4 @@ export {
   type Chapter,
   type Section
 } from './queries'
+export { urlFor } from './image'
