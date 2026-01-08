@@ -1,5 +1,5 @@
 import { defineType, defineField } from 'sanity'
-import { PainPointsPreview } from '../../components/previews/PainPointsPreview'
+import { PainPointsPreview } from '../../../components/previews/PainPointsPreview'
 
 /**
  * PainPoints block - List with "Sound familiar?" label

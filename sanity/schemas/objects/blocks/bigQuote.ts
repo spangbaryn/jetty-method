@@ -1,5 +1,5 @@
 import { defineType, defineField } from 'sanity'
-import { BigQuotePreview } from '../../components/previews/BigQuotePreview'
+import { BigQuotePreview } from '../../../components/previews/BigQuotePreview'
 
 /**
  * BigQuote block - Large decorative block quote

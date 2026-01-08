@@ -1,5 +1,5 @@
 import { defineType, defineArrayMember } from 'sanity'
-import { HighlightInput } from '../components/inputs/HighlightInput'
+import { HighlightInput } from '../../components/inputs/HighlightInput'
 
 /**
  * Custom Portable Text configuration

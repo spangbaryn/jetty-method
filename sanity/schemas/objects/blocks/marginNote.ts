@@ -1,5 +1,5 @@
 import { defineType, defineField } from 'sanity'
-import { MarginNotePreview } from '../../components/previews/MarginNotePreview'
+import { MarginNotePreview } from '../../../components/previews/MarginNotePreview'
 
 /**
  * MarginNote block - Sidebar callout with handwritten style
