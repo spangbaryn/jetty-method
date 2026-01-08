@@ -7,27 +7,6 @@ description: Guide feature planning with UX approach exploration and BDD scenari
 
 Guides Claude through feature planning including UX approach exploration, optional prototyping, and BDD scenario generation.
 
-## ⚠️ READ-ONLY UNTIL WORKTREE EXISTS
-
-**This skill starts as a planning/investigation phase. No worktree exists initially.**
-
-🚫 **FORBIDDEN until a worktree is created:**
-- Writing or editing any code files
-- Creating new files in the main repository
-
-✅ **ALLOWED during planning phases:**
-- Reading files to understand the codebase
-- Running `jettypod` commands
-- Asking the user questions
-- Analyzing and planning
-
-**Worktrees are created at specific steps:**
-- `work prototype start` (Step 4) - for UX prototyping
-- `work tests start` (Step 7) - for BDD test authoring
-- `work start` (Step 13) - for chore implementation (invokes speed-mode)
-
-**Only write files AFTER the relevant worktree command succeeds.**
-
 ## Instructions
 
 When this skill is activated, you are helping discover the best approach for a feature. Follow this structured approach:
