@@ -10,6 +10,8 @@
  * - GOOGLE_DOCS_FOLDER_ID: Optional - folder containing chapter docs
  */
 
+import 'server-only'
+
 import { parseChapter, type ParsedChapter } from './parser'
 
 // Google Docs API types
