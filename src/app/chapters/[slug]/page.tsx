@@ -1,6 +1,6 @@
 import { ChapterTitle, ChapterIntro, SectionHeading, ChapterSidebar } from '@/components/chapter'
 import { PortableText } from '@/components/portable-text'
-import { getAllChapters, getChapterBySlug, getChapterSlugs, type Chapter } from '@/lib/sanity'
+import { getAllChapters, getChapterBySlug, getChapterSlugs, type Chapter } from '@/lib/content'
 
 const BOOK_TITLE = 'The Jetty Method'
 
