@@ -6,6 +6,8 @@
  * and parsed into Portable Text format.
  */
 
+import 'server-only'
+
 export {
   parseContent,
   parseChapter,
