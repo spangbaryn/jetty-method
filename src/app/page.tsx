@@ -1,33 +1,12 @@
 import Link from 'next/link'
+import { getAllChapters } from '@/lib/content'
 
 const BOOK_TITLE = 'The Jetty Method'
 const BOOK_TAGLINE = 'A practical framework for building real software with AI—without an engineering background.'
 
-// Book structure: Parts containing chapters
-const bookStructure = [
-  {
-    title: 'Foundations',
-    chapters: [
-      { slug: 'introduction', title: 'Introduction' },
-    ],
-  },
-  {
-    title: 'The Method',
-    chapters: [
-      { slug: 'discovery', title: 'Discovery' },
-      { slug: 'implementation', title: 'Implementation' },
-    ],
-  },
-  {
-    title: 'Advanced Topics',
-    chapters: [
-      { slug: 'scaling', title: 'Scaling Your Project' },
-      { slug: 'collaboration', title: 'Working with Teams' },
-    ],
-  },
-]
+export default async function Home() {
+  const chapters = await getAllChapters()
 
-export default function Home() {
   return (
     <main className="min-h-screen max-w-3xl mx-auto px-6 py-16">
       {/* Book Header */}
@@ -52,25 +31,25 @@ export default function Home() {
           Contents
         </h2>
 
-        {bookStructure.map((part, partIndex) => (
-          <section key={partIndex} data-testid="toc-part" className="mb-8">
-            <h3 className="text-lg font-bold uppercase tracking-wider text-gray-400 mb-4 border-b pb-2">
-              Part {partIndex + 1}: {part.title}
-            </h3>
-            <ul className="space-y-3 pl-4">
-              {part.chapters.map((chapter) => (
-                <li key={chapter.slug} data-testid="toc-chapter" className="overflow-hidden">
-                  <Link
-                    href={`/chapters/${chapter.slug}`}
-                    className="text-xl font-serif text-gray-800 hover:text-blue-600 hover:underline transition-colors block truncate focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded"
-                  >
-                    {chapter.title}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </section>
-        ))}
+        <ul className="space-y-4">
+          {chapters.map((chapter, index) => (
+            <li key={chapter.slug.current} data-testid="toc-chapter" className="overflow-hidden">
+              <Link
+                href={`/chapters/${chapter.slug.current}`}
+                className="text-xl font-serif text-gray-800 hover:text-blue-600 hover:underline transition-colors block truncate focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded flex items-baseline gap-4"
+              >
+                <span className="text-gray-400 text-sm font-sans">{index + 1}</span>
+                <span>{chapter.title}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+
+        {chapters.length === 0 && (
+          <p className="text-center text-gray-500 italic">
+            No chapters found. Check your content source configuration.
+          </p>
+        )}
       </nav>
     </main>
   )
