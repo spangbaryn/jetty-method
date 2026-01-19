@@ -12,7 +12,7 @@
 
 import 'server-only'
 
-import { parseChapter, type ParsedChapter } from './parser'
+import { parseChapter, parseBook, type ParsedChapter } from './parser'
 
 // Google Docs API types
 interface GoogleDocsTextRun {
@@ -237,6 +237,15 @@ export async function fetchAllChapters(
     mappings.map((m) => fetchChapter(m.documentId, m.slug, m.order))
   )
   return chapters.sort((a, b) => a.order - b.order)
+}
+
+/**
+ * Fetch entire book from a single Google Doc
+ * Splits on H1 headings - each H1 becomes a chapter
+ */
+export async function fetchBook(documentId: string): Promise<ParsedChapter[]> {
+  const content = await fetchDocument(documentId)
+  return parseBook(content)
 }
 
 /**

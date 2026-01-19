@@ -6,7 +6,7 @@
  *
  * Environment variables:
  * - CONTENT_SOURCE: 'sanity' (default) or 'google-docs'
- * - GOOGLE_DOCS_CHAPTER_MAP: JSON mapping of slug -> documentId
+ * - GOOGLE_DOCS_BOOK_ID: Single document ID containing entire book (H1s = chapters)
  */
 
 import 'server-only'
@@ -20,10 +20,9 @@ import {
 } from './sanity'
 
 import {
-  fetchChapter,
+  fetchBook,
   isConfigured as isGoogleDocsConfigured,
   type ParsedChapter,
-  type ChapterMapping,
 } from './google-docs'
 
 // Re-export types for consumers
@@ -40,22 +39,10 @@ export function getContentSource(): ContentSource {
 }
 
 /**
- * Chapter mapping for Google Docs
- * Configure via GOOGLE_DOCS_CHAPTER_MAP env var as JSON
- * Example: [{"slug":"intro","documentId":"1abc...","order":0}]
+ * Get the book document ID from environment
  */
-function getChapterMappings(): ChapterMapping[] {
-  const mapJson = process.env.GOOGLE_DOCS_CHAPTER_MAP
-  if (!mapJson) {
-    return []
-  }
-
-  try {
-    return JSON.parse(mapJson) as ChapterMapping[]
-  } catch {
-    console.error('Invalid GOOGLE_DOCS_CHAPTER_MAP JSON')
-    return []
-  }
+function getBookId(): string | undefined {
+  return process.env.GOOGLE_DOCS_BOOK_ID
 }
 
 /**
@@ -76,6 +63,28 @@ function toChapter(parsed: ParsedChapter): Chapter {
   }
 }
 
+// Cache for parsed chapters (avoids re-fetching on each request)
+let chaptersCache: ParsedChapter[] | null = null
+let cacheTimestamp = 0
+const CACHE_TTL = 60 * 1000 // 1 minute
+
+async function getGoogleDocsChapters(): Promise<ParsedChapter[]> {
+  const bookId = getBookId()
+  if (!bookId) {
+    return []
+  }
+
+  // Check cache
+  if (chaptersCache && Date.now() - cacheTimestamp < CACHE_TTL) {
+    return chaptersCache
+  }
+
+  const chapters = await fetchBook(bookId)
+  chaptersCache = chapters
+  cacheTimestamp = Date.now()
+  return chapters
+}
+
 /**
  * Get all chapters from configured content source
  */
@@ -83,17 +92,15 @@ export async function getAllChapters(): Promise<Chapter[]> {
   const source = getContentSource()
 
   if (source === 'google-docs' && isGoogleDocsConfigured()) {
-    const mappings = getChapterMappings()
-    if (mappings.length === 0) {
-      console.warn('No Google Docs chapter mappings configured, falling back to Sanity')
+    const bookId = getBookId()
+    if (!bookId) {
+      console.warn('No GOOGLE_DOCS_BOOK_ID configured, falling back to Sanity')
       return getAllChaptersSanity()
     }
 
     try {
-      const chapters = await Promise.all(
-        mappings.map((m) => fetchChapter(m.documentId, m.slug, m.order))
-      )
-      return chapters.sort((a, b) => a.order - b.order).map(toChapter)
+      const chapters = await getGoogleDocsChapters()
+      return chapters.map(toChapter)
     } catch (error) {
       console.error('Failed to fetch from Google Docs, falling back to Sanity:', error)
       return getAllChaptersSanity()
@@ -110,19 +117,22 @@ export async function getChapterBySlug(slug: string): Promise<Chapter | null> {
   const source = getContentSource()
 
   if (source === 'google-docs' && isGoogleDocsConfigured()) {
-    const mappings = getChapterMappings()
-    const mapping = mappings.find((m) => m.slug === slug)
-
-    if (!mapping) {
-      console.warn(`No Google Docs mapping for slug "${slug}", falling back to Sanity`)
+    const bookId = getBookId()
+    if (!bookId) {
+      console.warn('No GOOGLE_DOCS_BOOK_ID configured, falling back to Sanity')
       return getChapterBySlugSanity(slug)
     }
 
     try {
-      const chapter = await fetchChapter(mapping.documentId, mapping.slug, mapping.order)
+      const chapters = await getGoogleDocsChapters()
+      const chapter = chapters.find((c) => c.slug.current === slug)
+      if (!chapter) {
+        console.warn(`Chapter "${slug}" not found in Google Doc, falling back to Sanity`)
+        return getChapterBySlugSanity(slug)
+      }
       return toChapter(chapter)
     } catch (error) {
-      console.error(`Failed to fetch "${slug}" from Google Docs, falling back to Sanity:`, error)
+      console.error(`Failed to fetch from Google Docs, falling back to Sanity:`, error)
       return getChapterBySlugSanity(slug)
     }
   }
@@ -137,9 +147,14 @@ export async function getChapterSlugs(): Promise<{ slug: { current: string } }[]
   const source = getContentSource()
 
   if (source === 'google-docs' && isGoogleDocsConfigured()) {
-    const mappings = getChapterMappings()
-    if (mappings.length > 0) {
-      return mappings.map((m) => ({ slug: { current: m.slug } }))
+    const bookId = getBookId()
+    if (bookId) {
+      try {
+        const chapters = await getGoogleDocsChapters()
+        return chapters.map((c) => ({ slug: { current: c.slug.current } }))
+      } catch {
+        // Fall through to Sanity
+      }
     }
   }
 
@@ -155,11 +170,19 @@ export function getContentStatus(): {
   fallbackAvailable: boolean
 } {
   const source = getContentSource()
-  const googleDocsConfigured = isGoogleDocsConfigured() && getChapterMappings().length > 0
+  const googleDocsConfigured = isGoogleDocsConfigured() && !!getBookId()
 
   return {
     source,
     configured: source === 'sanity' || googleDocsConfigured,
     fallbackAvailable: true, // Sanity is always available as fallback
   }
+}
+
+/**
+ * Clear the chapters cache (useful for development)
+ */
+export function clearContentCache(): void {
+  chaptersCache = null
+  cacheTimestamp = 0
 }
