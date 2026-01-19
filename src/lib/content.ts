@@ -9,6 +9,8 @@
  * - GOOGLE_DOCS_CHAPTER_MAP: JSON mapping of slug -> documentId
  */
 
+import 'server-only'
+
 import {
   getAllChapters as getAllChaptersSanity,
   getChapterBySlug as getChapterBySlugSanity,
