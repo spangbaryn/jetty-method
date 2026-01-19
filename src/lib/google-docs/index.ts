@@ -29,6 +29,7 @@ export {
   fetchDocument,
   fetchChapter,
   fetchAllChapters,
+  fetchBook,
   fetchDocumentCached,
   clearCache,
   isConfigured,
