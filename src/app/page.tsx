@@ -31,16 +31,29 @@ export default async function Home() {
           Contents
         </h2>
 
-        <ul className="space-y-4">
-          {chapters.map((chapter, index) => (
-            <li key={chapter.slug.current} data-testid="toc-chapter" className="overflow-hidden">
+        <ul className="space-y-6">
+          {chapters.map((chapter) => (
+            <li key={chapter.slug.current} data-testid="toc-chapter">
               <Link
                 href={`/chapters/${chapter.slug.current}`}
-                className="text-xl font-serif text-gray-800 hover:text-blue-600 hover:underline transition-colors block truncate focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded flex items-baseline gap-4"
+                className="text-xl font-serif text-gray-800 hover:text-blue-600 hover:underline transition-colors block focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded"
               >
-                <span className="text-gray-400 text-sm font-sans">{index + 1}</span>
-                <span>{chapter.title}</span>
+                {chapter.title}
               </Link>
+              {chapter.sections && chapter.sections.length > 0 && (
+                <ul className="mt-2 ml-8 space-y-1">
+                  {chapter.sections.map((section) => (
+                    <li key={section.anchor.current} data-testid="toc-section">
+                      <Link
+                        href={`/chapters/${chapter.slug.current}#${section.anchor.current}`}
+                        className="text-sm text-gray-500 hover:text-blue-600 hover:underline transition-colors"
+                      >
+                        {section.heading}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </li>
           ))}
         </ul>
