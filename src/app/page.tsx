@@ -26,11 +26,7 @@ export default async function Home() {
       </header>
 
       {/* Table of Contents */}
-      <nav data-testid="table-of-contents" className="space-y-10">
-        <h2 className="text-2xl font-bold mb-8 text-center uppercase tracking-wide text-gray-500">
-          Contents
-        </h2>
-
+      <nav data-testid="table-of-contents">
         <ul className="space-y-6">
           {chapters.map((chapter) => (
             <li key={chapter.slug.current} data-testid="toc-chapter">
