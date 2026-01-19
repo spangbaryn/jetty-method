@@ -12,6 +12,7 @@
 
 import 'server-only'
 
+import { GoogleAuth } from 'google-auth-library'
 import { parseChapter, parseBook, type ParsedChapter } from './parser'
 
 // Google Docs API types
@@ -76,61 +77,46 @@ export function isConfigured(): boolean {
   return !!(config.serviceAccountEmail && config.privateKey)
 }
 
+// Cached auth client
+let authClient: GoogleAuth | null = null
+
 /**
- * Get an access token using service account credentials
+ * Get GoogleAuth client (cached)
  */
-async function getAccessToken(config: GoogleDocsConfig): Promise<string> {
+function getAuthClient(config: GoogleDocsConfig): GoogleAuth {
   if (!config.serviceAccountEmail || !config.privateKey) {
     throw new Error('Google Docs not configured: missing service account credentials')
   }
 
-  // Create JWT for service account
-  const now = Math.floor(Date.now() / 1000)
-  const header = {
-    alg: 'RS256',
-    typ: 'JWT',
-  }
-  const payload = {
-    iss: config.serviceAccountEmail,
-    scope: 'https://www.googleapis.com/auth/documents.readonly https://www.googleapis.com/auth/drive.readonly',
-    aud: 'https://oauth2.googleapis.com/token',
-    exp: now + 3600,
-    iat: now,
-  }
-
-  // Note: In production, use a proper JWT library like 'jsonwebtoken'
-  // This is a simplified implementation for demonstration
-  const base64Header = Buffer.from(JSON.stringify(header)).toString('base64url')
-  const base64Payload = Buffer.from(JSON.stringify(payload)).toString('base64url')
-
-  // For now, we'll use a simpler approach that works without crypto
-  // In production, implement proper RS256 signing
-  const crypto = await import('crypto')
-  const sign = crypto.createSign('RSA-SHA256')
-  sign.update(`${base64Header}.${base64Payload}`)
-  const signature = sign.sign(config.privateKey, 'base64url')
-
-  const jwt = `${base64Header}.${base64Payload}.${signature}`
-
-  // Exchange JWT for access token
-  const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: new URLSearchParams({
-      grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
-      assertion: jwt,
-    }),
-  })
-
-  if (!tokenResponse.ok) {
-    const error = await tokenResponse.text()
-    throw new Error(`Failed to get access token: ${error}`)
+  if (!authClient) {
+    authClient = new GoogleAuth({
+      credentials: {
+        client_email: config.serviceAccountEmail,
+        private_key: config.privateKey,
+      },
+      scopes: [
+        'https://www.googleapis.com/auth/documents.readonly',
+        'https://www.googleapis.com/auth/drive.readonly',
+      ],
+    })
   }
 
-  const tokenData = await tokenResponse.json()
-  return tokenData.access_token
+  return authClient
+}
+
+/**
+ * Get an access token using service account credentials
+ */
+async function getAccessToken(config: GoogleDocsConfig): Promise<string> {
+  const auth = getAuthClient(config)
+  const client = await auth.getClient()
+  const tokenResponse = await client.getAccessToken()
+
+  if (!tokenResponse.token) {
+    throw new Error('Failed to get access token')
+  }
+
+  return tokenResponse.token
 }
 
 /**
