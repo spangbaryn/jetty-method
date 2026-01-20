@@ -12,6 +12,7 @@
 
 import 'server-only'
 
+import { createPrivateKey } from 'crypto'
 import { SignJWT, importPKCS8 } from 'jose'
 import { parseChapter, parseBook, type ParsedChapter } from './parser'
 
@@ -81,6 +82,40 @@ export function isConfigured(): boolean {
 let cachedToken: { token: string; expiry: number } | null = null
 
 /**
+ * Normalize private key to PKCS#8 format
+ * Handles both PKCS#1 (BEGIN RSA PRIVATE KEY) and PKCS#8 (BEGIN PRIVATE KEY)
+ * Also normalizes escaped newlines from environment variables
+ */
+function normalizeToPkcs8(key: string): string {
+  // Normalize escaped newlines from env vars
+  let normalized = key.replace(/\\n/g, '\n')
+
+  // Ensure proper line breaks (some envs use literal \n strings)
+  if (!normalized.includes('\n')) {
+    // Key might be on single line - try to split at expected boundaries
+    normalized = normalized
+      .replace(/-----BEGIN/g, '\n-----BEGIN')
+      .replace(/-----END/g, '\n-----END')
+      .replace(/(.{64})/g, '$1\n')
+      .trim()
+  }
+
+  // If already PKCS#8 format, return as-is
+  if (normalized.includes('-----BEGIN PRIVATE KEY-----')) {
+    return normalized
+  }
+
+  // If PKCS#1 format, convert to PKCS#8 using Node's crypto
+  if (normalized.includes('-----BEGIN RSA PRIVATE KEY-----')) {
+    const keyObject = createPrivateKey(normalized)
+    return keyObject.export({ type: 'pkcs8', format: 'pem' }) as string
+  }
+
+  // Unknown format - return as-is and let jose throw a descriptive error
+  return normalized
+}
+
+/**
  * Create a signed JWT for Google service account authentication
  * Uses jose library which uses WebCrypto (works on Vercel/OpenSSL 3.0)
  */
@@ -92,8 +127,11 @@ async function createSignedJwt(config: GoogleDocsConfig): Promise<string> {
   const now = Math.floor(Date.now() / 1000)
   const expiry = now + 3600 // 1 hour
 
+  // Normalize key to PKCS#8 format (handles PKCS#1 conversion)
+  const pkcs8Key = normalizeToPkcs8(config.privateKey)
+
   // Import the private key using jose (WebCrypto-based, no OpenSSL)
-  const privateKey = await importPKCS8(config.privateKey, 'RS256')
+  const privateKey = await importPKCS8(pkcs8Key, 'RS256')
 
   // Create and sign the JWT
   const jwt = await new SignJWT({
