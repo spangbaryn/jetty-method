@@ -87,11 +87,21 @@ let cachedToken: { token: string; expiry: number } | null = null
  * Also normalizes escaped newlines from environment variables
  */
 function normalizeToPkcs8(key: string): string {
+  // Debug: Log key info for diagnosis
+  console.log('[GDocs Key Debug] Input key length:', key.length)
+  console.log('[GDocs Key Debug] First 50 chars:', key.substring(0, 50))
+  console.log('[GDocs Key Debug] Contains literal \\n:', key.includes('\\n'))
+  console.log('[GDocs Key Debug] Contains actual newline:', key.includes('\n'))
+
   // Normalize escaped newlines from env vars
   let normalized = key.replace(/\\n/g, '\n')
 
+  console.log('[GDocs Key Debug] After \\n replacement - contains newline:', normalized.includes('\n'))
+  console.log('[GDocs Key Debug] First 100 chars after normalization:', normalized.substring(0, 100))
+
   // Ensure proper line breaks (some envs use literal \n strings)
   if (!normalized.includes('\n')) {
+    console.log('[GDocs Key Debug] No newlines found - attempting to split')
     // Key might be on single line - try to split at expected boundaries
     normalized = normalized
       .replace(/-----BEGIN/g, '\n-----BEGIN')
@@ -100,18 +110,35 @@ function normalizeToPkcs8(key: string): string {
       .trim()
   }
 
+  // Check for key format
+  const isPkcs8 = normalized.includes('-----BEGIN PRIVATE KEY-----')
+  const isPkcs1 = normalized.includes('-----BEGIN RSA PRIVATE KEY-----')
+  console.log('[GDocs Key Debug] Is PKCS#8:', isPkcs8)
+  console.log('[GDocs Key Debug] Is PKCS#1:', isPkcs1)
+
   // If already PKCS#8 format, return as-is
-  if (normalized.includes('-----BEGIN PRIVATE KEY-----')) {
+  if (isPkcs8) {
+    console.log('[GDocs Key Debug] Returning PKCS#8 key as-is')
     return normalized
   }
 
   // If PKCS#1 format, convert to PKCS#8 using Node's crypto
-  if (normalized.includes('-----BEGIN RSA PRIVATE KEY-----')) {
-    const keyObject = createPrivateKey(normalized)
-    return keyObject.export({ type: 'pkcs8', format: 'pem' }) as string
+  if (isPkcs1) {
+    console.log('[GDocs Key Debug] Converting PKCS#1 to PKCS#8...')
+    try {
+      const keyObject = createPrivateKey(normalized)
+      const pkcs8 = keyObject.export({ type: 'pkcs8', format: 'pem' }) as string
+      console.log('[GDocs Key Debug] Conversion successful')
+      return pkcs8
+    } catch (err) {
+      console.log('[GDocs Key Debug] PKCS#1 to PKCS#8 conversion FAILED:', err)
+      // Fall through to return as-is
+    }
   }
 
   // Unknown format - return as-is and let jose throw a descriptive error
+  console.log('[GDocs Key Debug] Unknown format or conversion failed - returning normalized key')
+  console.log('[GDocs Key Debug] Key header:', normalized.substring(0, 60))
   return normalized
 }
 
