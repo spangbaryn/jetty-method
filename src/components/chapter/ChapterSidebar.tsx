@@ -19,10 +19,7 @@ interface ChapterSidebarProps {
 }
 
 export function ChapterSidebar({ bookTitle, currentSlug, chapters, sections, nextChapter }: ChapterSidebarProps) {
-  // Find current chapter index for chapter number
-  const currentChapterIndex = chapters.findIndex((c) => c.slug === currentSlug)
-  const currentChapter = chapters[currentChapterIndex]
-  const chapterNumber = currentChapterIndex + 1
+  const currentChapter = chapters.find((c) => c.slug === currentSlug)
 
   return (
     <aside
@@ -38,11 +35,8 @@ export function ChapterSidebar({ bookTitle, currentSlug, chapters, sections, nex
         {bookTitle}
       </a>
 
-      {/* Current chapter info - Shape Up style */}
+      {/* Current chapter title */}
       <div data-testid="chapter-list" className="text-right">
-        <p className="text-sm tracking-widest text-gray-500 mb-2">
-          CHAPTER {chapterNumber}:
-        </p>
         <h2 className="text-2xl font-bold text-[#1a3a4a] leading-tight mb-6 border-none p-0 m-0">
           {currentChapter?.title}
         </h2>
