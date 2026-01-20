@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import { getAllChapters } from '@/lib/content'
 
@@ -11,6 +12,14 @@ export default async function Home() {
     <main className="min-h-screen max-w-3xl mx-auto px-6 py-16">
       {/* Book Header */}
       <header className="mb-16 text-center">
+        <Image
+          src="/jetty-method-logo.png"
+          alt="The Jetty Method"
+          width={200}
+          height={200}
+          className="mx-auto mb-8"
+          priority
+        />
         <h1
           className="text-5xl font-bold mb-6 font-serif"
           data-testid="book-title"
