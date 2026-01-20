@@ -19,10 +19,15 @@ interface ChapterSidebarProps {
 }
 
 export function ChapterSidebar({ bookTitle, currentSlug, chapters, sections, nextChapter }: ChapterSidebarProps) {
+  // Find current chapter index for chapter number
+  const currentChapterIndex = chapters.findIndex((c) => c.slug === currentSlug)
+  const currentChapter = chapters[currentChapterIndex]
+  const chapterNumber = currentChapterIndex + 1
+
   return (
     <aside
       data-testid="chapter-sidebar"
-      className="w-full md:w-64 shrink-0 md:sticky md:top-0 md:h-screen overflow-y-auto p-6 md:py-12 md:pr-8 border-b md:border-b-0 border-gray-200"
+      className="w-full md:w-72 shrink-0 md:sticky md:top-0 md:h-screen overflow-y-auto p-6 md:py-12 md:pr-8 border-b md:border-b-0 border-gray-200"
     >
       <a
         href="/"
@@ -33,40 +38,25 @@ export function ChapterSidebar({ bookTitle, currentSlug, chapters, sections, nex
         {bookTitle}
       </a>
 
-      <nav data-testid="chapter-list">
-        <ul className="space-y-2">
-          {chapters.map((chapter) => {
-            const isActive = chapter.slug === currentSlug
-            return (
-              <li key={chapter.slug}>
-                <a
-                  href={`/chapters/${chapter.slug}`}
-                  data-testid={isActive ? 'chapter-link-active' : undefined}
-                  className={`block py-1 text-sm ${
-                    isActive
-                      ? 'font-semibold text-gray-900'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  {chapter.title}
-                </a>
-              </li>
-            )
-          })}
-        </ul>
-      </nav>
+      {/* Current chapter info - Shape Up style */}
+      <div data-testid="chapter-list" className="text-right">
+        <p className="text-sm tracking-widest text-gray-500 mb-2">
+          CHAPTER {chapterNumber}:
+        </p>
+        <h2 className="text-2xl font-bold text-[#1a3a4a] leading-tight mb-6 border-none p-0 m-0">
+          {currentChapter?.title}
+        </h2>
+      </div>
 
+      {/* Section links - italicized, right-aligned */}
       {sections.length > 0 && (
-        <nav data-testid="section-toc" className="mt-6 pt-6 border-t border-gray-200">
-          <h3 className="text-xs font-semibold uppercase text-gray-500 mb-3">
-            On this page
-          </h3>
-          <ul className="space-y-2">
+        <nav data-testid="section-toc" className="text-right">
+          <ul className="space-y-1.5">
             {sections.map((section) => (
               <li key={section.id}>
                 <a
                   href={`#${section.id}`}
-                  className="block py-1 text-sm text-gray-600 hover:text-gray-900"
+                  className="block py-0.5 text-base italic text-[#1a3a4a] hover:underline"
                 >
                   {section.title}
                 </a>
@@ -77,13 +67,13 @@ export function ChapterSidebar({ bookTitle, currentSlug, chapters, sections, nex
       )}
 
       {nextChapter && (
-        <div className="mt-6 pt-6 border-t border-gray-200">
+        <div className="mt-8 text-right">
           <a
             href={`/chapters/${nextChapter.slug}`}
             data-testid="next-chapter-link"
-            className="block text-sm text-blue-600 hover:text-blue-800"
+            className="block text-base text-[#1a3a4a] hover:underline"
           >
-            Next: {nextChapter.title} →
+            Next: {nextChapter.title}
           </a>
         </div>
       )}

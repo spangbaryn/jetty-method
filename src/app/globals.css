@@ -39,6 +39,7 @@
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-serif);
+    font-size: 1.125rem; /* 18px base for better readability */
     line-height: 1.75;
   }
 }
