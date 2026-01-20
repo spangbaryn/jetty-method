@@ -41,7 +41,7 @@ export default async function Home() {
             <li key={chapter.slug.current} data-testid="toc-chapter">
               <Link
                 href={`/chapters/${chapter.slug.current}`}
-                className="text-xl font-serif text-gray-800 hover:text-blue-600 hover:underline transition-colors block focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded"
+                className="text-xl font-serif font-semibold text-gray-900 hover:text-blue-600 hover:underline transition-colors block focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded"
               >
                 {chapter.title}
               </Link>
