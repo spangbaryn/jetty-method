@@ -51,7 +51,7 @@ export default async function Home() {
                     <li key={section.anchor.current} data-testid="toc-section">
                       <Link
                         href={`/chapters/${chapter.slug.current}#${section.anchor.current}`}
-                        className="text-sm text-gray-500 hover:text-blue-600 hover:underline transition-colors"
+                        className="text-base text-gray-700 hover:text-blue-600 hover:underline transition-colors"
                       >
                         {section.heading}
                       </Link>
