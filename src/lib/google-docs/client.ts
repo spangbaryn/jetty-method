@@ -12,7 +12,6 @@
 
 import 'server-only'
 
-import { createPrivateKey } from 'crypto'
 import { SignJWT, importPKCS8 } from 'jose'
 import { parseChapter, parseBook, type ParsedChapter } from './parser'
 
@@ -82,63 +81,54 @@ export function isConfigured(): boolean {
 let cachedToken: { token: string; expiry: number } | null = null
 
 /**
- * Normalize private key to PKCS#8 format
- * Handles both PKCS#1 (BEGIN RSA PRIVATE KEY) and PKCS#8 (BEGIN PRIVATE KEY)
- * Also normalizes escaped newlines from environment variables
+ * Reformat a PEM key to ensure it's in the exact format jose expects
+ * - Strips and rebuilds PEM structure
+ * - Removes any hidden characters (carriage returns, etc.)
+ * - Ensures proper 64-character line breaks
+ * - Adds final newline
  */
-function normalizeToPkcs8(key: string): string {
-  // Debug: Log key info for diagnosis
-  console.log('[GDocs Key Debug] Input key length:', key.length)
-  console.log('[GDocs Key Debug] First 50 chars:', key.substring(0, 50))
-  console.log('[GDocs Key Debug] Contains literal \\n:', key.includes('\\n'))
-  console.log('[GDocs Key Debug] Contains actual newline:', key.includes('\n'))
-
-  // Normalize escaped newlines from env vars
+function reformatPem(key: string): string {
+  // First normalize escaped newlines from env vars
   let normalized = key.replace(/\\n/g, '\n')
 
-  console.log('[GDocs Key Debug] After \\n replacement - contains newline:', normalized.includes('\n'))
-  console.log('[GDocs Key Debug] First 100 chars after normalization:', normalized.substring(0, 100))
+  // Debug logging
+  console.log('[GDocs Key] Input length:', key.length)
+  console.log('[GDocs Key] Has escaped newlines:', key.includes('\\n'))
 
-  // Ensure proper line breaks (some envs use literal \n strings)
-  if (!normalized.includes('\n')) {
-    console.log('[GDocs Key Debug] No newlines found - attempting to split')
-    // Key might be on single line - try to split at expected boundaries
-    normalized = normalized
-      .replace(/-----BEGIN/g, '\n-----BEGIN')
-      .replace(/-----END/g, '\n-----END')
-      .replace(/(.{64})/g, '$1\n')
-      .trim()
+  // Extract the key type and base64 content
+  const pkcs8Match = normalized.match(/-----BEGIN PRIVATE KEY-----([\s\S]*?)-----END PRIVATE KEY-----/)
+  const pkcs1Match = normalized.match(/-----BEGIN RSA PRIVATE KEY-----([\s\S]*?)-----END RSA PRIVATE KEY-----/)
+
+  if (pkcs8Match) {
+    // Extract base64 content, remove ALL whitespace and non-base64 characters
+    const base64Content = pkcs8Match[1].replace(/[^A-Za-z0-9+/=]/g, '')
+
+    console.log('[GDocs Key] Format: PKCS#8')
+    console.log('[GDocs Key] Base64 length:', base64Content.length)
+
+    // Rebuild with proper 64-char line breaks
+    const lines: string[] = []
+    for (let i = 0; i < base64Content.length; i += 64) {
+      lines.push(base64Content.slice(i, i + 64))
+    }
+
+    const reformatted = `-----BEGIN PRIVATE KEY-----\n${lines.join('\n')}\n-----END PRIVATE KEY-----\n`
+    console.log('[GDocs Key] Reformatted length:', reformatted.length)
+    console.log('[GDocs Key] First 80 chars:', reformatted.substring(0, 80))
+
+    return reformatted
   }
 
-  // Check for key format
-  const isPkcs8 = normalized.includes('-----BEGIN PRIVATE KEY-----')
-  const isPkcs1 = normalized.includes('-----BEGIN RSA PRIVATE KEY-----')
-  console.log('[GDocs Key Debug] Is PKCS#8:', isPkcs8)
-  console.log('[GDocs Key Debug] Is PKCS#1:', isPkcs1)
-
-  // If already PKCS#8 format, return as-is
-  if (isPkcs8) {
-    console.log('[GDocs Key Debug] Returning PKCS#8 key as-is')
+  if (pkcs1Match) {
+    // PKCS#1 format - jose doesn't support this directly
+    // For now, log and return as-is (will fail, but with clear error)
+    console.log('[GDocs Key] Format: PKCS#1 (not supported by jose)')
+    console.log('[GDocs Key] You need to convert your key to PKCS#8 format')
     return normalized
   }
 
-  // If PKCS#1 format, convert to PKCS#8 using Node's crypto
-  if (isPkcs1) {
-    console.log('[GDocs Key Debug] Converting PKCS#1 to PKCS#8...')
-    try {
-      const keyObject = createPrivateKey(normalized)
-      const pkcs8 = keyObject.export({ type: 'pkcs8', format: 'pem' }) as string
-      console.log('[GDocs Key Debug] Conversion successful')
-      return pkcs8
-    } catch (err) {
-      console.log('[GDocs Key Debug] PKCS#1 to PKCS#8 conversion FAILED:', err)
-      // Fall through to return as-is
-    }
-  }
-
-  // Unknown format - return as-is and let jose throw a descriptive error
-  console.log('[GDocs Key Debug] Unknown format or conversion failed - returning normalized key')
-  console.log('[GDocs Key Debug] Key header:', normalized.substring(0, 60))
+  // Unknown format
+  console.log('[GDocs Key] Unknown format - first 60 chars:', normalized.substring(0, 60))
   return normalized
 }
 
@@ -154,8 +144,8 @@ async function createSignedJwt(config: GoogleDocsConfig): Promise<string> {
   const now = Math.floor(Date.now() / 1000)
   const expiry = now + 3600 // 1 hour
 
-  // Normalize key to PKCS#8 format (handles PKCS#1 conversion)
-  const pkcs8Key = normalizeToPkcs8(config.privateKey)
+  // Reformat key to ensure proper PEM structure for jose
+  const pkcs8Key = reformatPem(config.privateKey)
 
   // Import the private key using jose (WebCrypto-based, no OpenSSL)
   const privateKey = await importPKCS8(pkcs8Key, 'RS256')
