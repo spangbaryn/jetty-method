@@ -12,7 +12,7 @@
 
 import 'server-only'
 
-import { GoogleAuth } from 'google-auth-library'
+import { SignJWT, importPKCS8 } from 'jose'
 import { parseChapter, parseBook, type ParsedChapter } from './parser'
 
 // Google Docs API types
@@ -77,46 +77,81 @@ export function isConfigured(): boolean {
   return !!(config.serviceAccountEmail && config.privateKey)
 }
 
-// Cached auth client
-let authClient: GoogleAuth | null = null
+// Cached access token
+let cachedToken: { token: string; expiry: number } | null = null
 
 /**
- * Get GoogleAuth client (cached)
+ * Create a signed JWT for Google service account authentication
+ * Uses jose library which uses WebCrypto (works on Vercel/OpenSSL 3.0)
  */
-function getAuthClient(config: GoogleDocsConfig): GoogleAuth {
+async function createSignedJwt(config: GoogleDocsConfig): Promise<string> {
   if (!config.serviceAccountEmail || !config.privateKey) {
     throw new Error('Google Docs not configured: missing service account credentials')
   }
 
-  if (!authClient) {
-    authClient = new GoogleAuth({
-      credentials: {
-        client_email: config.serviceAccountEmail,
-        private_key: config.privateKey,
-      },
-      scopes: [
-        'https://www.googleapis.com/auth/documents.readonly',
-        'https://www.googleapis.com/auth/drive.readonly',
-      ],
-    })
+  const now = Math.floor(Date.now() / 1000)
+  const expiry = now + 3600 // 1 hour
+
+  // Import the private key using jose (WebCrypto-based, no OpenSSL)
+  const privateKey = await importPKCS8(config.privateKey, 'RS256')
+
+  // Create and sign the JWT
+  const jwt = await new SignJWT({
+    scope: 'https://www.googleapis.com/auth/documents.readonly https://www.googleapis.com/auth/drive.readonly',
+  })
+    .setProtectedHeader({ alg: 'RS256', typ: 'JWT' })
+    .setIssuer(config.serviceAccountEmail)
+    .setSubject(config.serviceAccountEmail)
+    .setAudience('https://oauth2.googleapis.com/token')
+    .setIssuedAt(now)
+    .setExpirationTime(expiry)
+    .sign(privateKey)
+
+  return jwt
+}
+
+/**
+ * Exchange a signed JWT for an access token from Google
+ */
+async function exchangeJwtForToken(jwt: string): Promise<{ token: string; expiry: number }> {
+  const response = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: new URLSearchParams({
+      grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+      assertion: jwt,
+    }),
+  })
+
+  if (!response.ok) {
+    const error = await response.text()
+    throw new Error(`Failed to exchange JWT for token: ${error}`)
   }
 
-  return authClient
+  const data = await response.json()
+  return {
+    token: data.access_token,
+    expiry: Date.now() + (data.expires_in * 1000) - 60000, // Subtract 1 minute for safety
+  }
 }
 
 /**
  * Get an access token using service account credentials
+ * Uses jose for JWT signing (WebCrypto-based, works on Vercel)
  */
 async function getAccessToken(config: GoogleDocsConfig): Promise<string> {
-  const auth = getAuthClient(config)
-  const client = await auth.getClient()
-  const tokenResponse = await client.getAccessToken()
-
-  if (!tokenResponse.token) {
-    throw new Error('Failed to get access token')
+  // Check if we have a valid cached token
+  if (cachedToken && Date.now() < cachedToken.expiry) {
+    return cachedToken.token
   }
 
-  return tokenResponse.token
+  // Create a signed JWT and exchange it for an access token
+  const jwt = await createSignedJwt(config)
+  cachedToken = await exchangeJwtForToken(jwt)
+
+  return cachedToken.token
 }
 
 /**
