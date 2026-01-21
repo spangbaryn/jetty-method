@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 
-type Step = 'collapsed' | 'email' | 'experience' | 'success'
+type Step = 'collapsed' | 'email' | 'experience' | 'success' | 'duplicate'
 type ExperienceLevel = 'none' | 'some' | 'active'
 
 interface WaitlistCardProps {
@@ -46,16 +46,24 @@ export function WaitlistCard({ onSubmit }: WaitlistCardProps) {
 
     if (onSubmit) {
       await onSubmit({ email, experience })
+      setIsSubmitting(false)
+      setStep('success')
     } else {
-      await fetch('/api/waitlist', {
+      const response = await fetch('/api/waitlist', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, experience })
       })
-    }
 
-    setIsSubmitting(false)
-    setStep('success')
+      setIsSubmitting(false)
+
+      const data = await response.json()
+      if (data.error === 'duplicate') {
+        setStep('duplicate')
+      } else {
+        setStep('success')
+      }
+    }
   }
 
   return (
@@ -152,6 +160,16 @@ export function WaitlistCard({ onSubmit }: WaitlistCardProps) {
           <div className="text-2xl mb-1">&#10003;</div>
           <p className="text-sm text-gray-600 font-sans">
             You're on the list!
+          </p>
+        </div>
+      )}
+
+      {/* Duplicate email message */}
+      {step === 'duplicate' && (
+        <div className="text-center py-2" data-testid="waitlist-duplicate-message">
+          <div className="text-2xl mb-1">&#10003;</div>
+          <p className="text-sm text-gray-600 font-sans">
+            You're already on the list!
           </p>
         </div>
       )}

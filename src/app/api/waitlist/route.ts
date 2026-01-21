@@ -29,6 +29,12 @@ export async function POST(request: Request) {
 
   const entries = await readWaitlist()
 
+  // Check for duplicate email
+  const isDuplicate = entries.some(entry => entry.email.toLowerCase() === email.toLowerCase())
+  if (isDuplicate) {
+    return NextResponse.json({ success: false, error: 'duplicate' }, { status: 409 })
+  }
+
   entries.push({
     email,
     experience,
