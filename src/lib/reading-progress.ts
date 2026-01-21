@@ -16,31 +16,46 @@ export interface ReadingProgress {
 
 /**
  * Get current reading progress from localStorage
+ * Gracefully handles corrupted data and localStorage unavailability
  */
 export function getReadingProgress(): ReadingProgress | null {
   if (typeof window === 'undefined') return null
 
-  const stored = localStorage.getItem(STORAGE_KEY)
-  if (!stored) return null
-
   try {
-    const parsed = JSON.parse(stored)
-    if (parsed.chapter && parsed.section) {
-      return parsed as ReadingProgress
+    const stored = localStorage.getItem(STORAGE_KEY)
+    if (!stored) return null
+
+    try {
+      const parsed = JSON.parse(stored)
+      if (parsed.chapter && parsed.section) {
+        return parsed as ReadingProgress
+      }
+      // Invalid structure - clear corrupted data
+      clearReadingProgress()
+      return null
+    } catch {
+      // Corrupted JSON - clear it and return null
+      clearReadingProgress()
+      return null
     }
-    return null
   } catch {
+    // localStorage unavailable (private browsing, etc.) - fail silently
     return null
   }
 }
 
 /**
  * Save reading progress to localStorage
+ * Fails silently if localStorage is unavailable
  */
 export function setReadingProgress(chapter: string, section: string): void {
   if (typeof window === 'undefined') return
 
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({ chapter, section }))
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ chapter, section }))
+  } catch {
+    // localStorage unavailable (private browsing, quota exceeded, etc.) - fail silently
+  }
 }
 
 /**
@@ -79,8 +94,14 @@ export function shouldUpdateProgress(
 
 /**
  * Clear reading progress (for testing or user reset)
+ * Fails silently if localStorage is unavailable
  */
 export function clearReadingProgress(): void {
   if (typeof window === 'undefined') return
-  localStorage.removeItem(STORAGE_KEY)
+
+  try {
+    localStorage.removeItem(STORAGE_KEY)
+  } catch {
+    // localStorage unavailable - fail silently
+  }
 }
