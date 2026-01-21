@@ -110,8 +110,8 @@ export function WaitlistCard({ onSubmit }: WaitlistCardProps) {
       {/* Email step */}
       {step === 'email' && (
         <div>
-          <p className="text-sm text-gray-600 mb-3 font-sans">
-            Reserve your spot.
+          <p className="text-sm text-gray-600 mb-3 text-center font-sans">
+            Reserve your spot. No junk.
           </p>
           <form onSubmit={handleEmailSubmit} className="space-y-2">
             <input
