@@ -12,10 +12,28 @@ interface WaitlistSectionProps {
 export function WaitlistSection({ onSubmit }: WaitlistSectionProps) {
   const [step, setStep] = useState<Step>('email')
   const [email, setEmail] = useState('')
+  const [emailError, setEmailError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const validateEmail = (email: string): string | null => {
+    if (!email.trim()) {
+      return 'Email is required'
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      return 'Please enter a valid email address'
+    }
+    return null
+  }
 
   const handleEmailSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    const error = validateEmail(email)
+    if (error) {
+      setEmailError(error)
+      return
+    }
+    setEmailError('')
     setStep('experience')
   }
 
@@ -52,23 +70,34 @@ export function WaitlistSection({ onSubmit }: WaitlistSectionProps) {
             <p className="text-gray-600 mb-6 font-sans">
               A free tool for implementing the Jetty Method.<br />Join the waitlist.
             </p>
-            <form onSubmit={handleEmailSubmit} className="flex gap-3" data-testid="waitlist-form">
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                required
-                data-testid="waitlist-email-input"
-                className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-              />
-              <button
-                type="submit"
-                data-testid="waitlist-join-button"
-                className="px-6 py-3 bg-[#2c2c2c] text-white rounded-lg hover:bg-[#1a1a1a] transition-colors font-medium"
-              >
-                Join
-              </button>
+            <form onSubmit={handleEmailSubmit} className="flex flex-col gap-2" data-testid="waitlist-form">
+              <div className="flex gap-3">
+                <input
+                  type="text"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value)
+                    if (emailError) setEmailError('')
+                  }}
+                  placeholder="you@example.com"
+                  data-testid="waitlist-email-input"
+                  className={`flex-1 px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent ${
+                    emailError ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                />
+                <button
+                  type="submit"
+                  data-testid="waitlist-join-button"
+                  className="px-6 py-3 bg-[#2c2c2c] text-white rounded-lg hover:bg-[#1a1a1a] transition-colors font-medium"
+                >
+                  Join
+                </button>
+              </div>
+              {emailError && (
+                <p data-testid="waitlist-email-error" className="text-red-500 text-sm text-left">
+                  {emailError}
+                </p>
+              )}
             </form>
           </div>
         )}
