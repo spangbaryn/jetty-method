@@ -34,6 +34,17 @@ export default async function Home() {
         >
           {BOOK_TAGLINE}
         </p>
+        <p className="mt-4 text-gray-500 font-sans">
+          by{' '}
+          <a
+            href="https://www.linkedin.com/in/espangenberg/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gray-700 underline hover:text-gray-900"
+          >
+            Erik Spangenberg
+          </a>
+        </p>
         <ResumeReadingButton chapterSlugs={chapters.map(c => c.slug.current)} />
       </header>
 
