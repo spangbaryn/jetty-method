@@ -40,7 +40,7 @@ export function ResumeReadingButton({ chapterSlugs = [] }: ResumeReadingButtonPr
     <Link
       href={resumeUrl}
       data-testid="resume-reading-button"
-      className="inline-flex items-center gap-2 px-6 py-3 mt-6 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+      className="inline-flex items-center gap-2 px-6 py-3 mt-6 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors font-medium"
     >
       <span>Pick up where you left off</span>
       <svg
