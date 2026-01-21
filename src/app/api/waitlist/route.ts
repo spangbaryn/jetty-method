@@ -4,7 +4,7 @@ const MAILERLITE_API_KEY = process.env.MAILERLITE_API_KEY
 const MAILERLITE_GROUP_ID = process.env.MAILERLITE_GROUP_ID
 
 export async function POST(request: Request) {
-  const { email, experience } = await request.json()
+  const { email, experience, newsletter } = await request.json()
 
   if (!MAILERLITE_API_KEY || !MAILERLITE_GROUP_ID) {
     console.error('MailerLite environment variables not configured')
@@ -21,7 +21,8 @@ export async function POST(request: Request) {
       email,
       groups: [MAILERLITE_GROUP_ID],
       fields: {
-        experience: experience
+        experience: experience,
+        newsletter: newsletter ? 'yes' : 'no'
       }
     })
   })

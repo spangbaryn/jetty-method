@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from 'react'
 
-type Step = 'collapsed' | 'email' | 'experience' | 'success' | 'duplicate' | 'error'
+type Step = 'collapsed' | 'email' | 'experience' | 'newsletter' | 'success' | 'duplicate' | 'error'
 type ExperienceLevel = 'none' | 'some' | 'active'
 
 interface WaitlistCardProps {
-  onSubmit?: (data: { email: string; experience: ExperienceLevel }) => Promise<void>
+  onSubmit?: (data: { email: string; experience: ExperienceLevel; newsletter: boolean }) => Promise<void>
 }
 
 export function WaitlistCard({ onSubmit }: WaitlistCardProps) {
@@ -47,13 +47,17 @@ export function WaitlistCard({ onSubmit }: WaitlistCardProps) {
     setStep('experience')
   }
 
-  const handleExperienceSelect = async (experience: ExperienceLevel) => {
-    setIsSubmitting(true)
+  const handleExperienceSelect = (experience: ExperienceLevel) => {
     setSelectedExperience(experience)
+    setStep('newsletter')
+  }
+
+  const handleNewsletterChoice = async (wantsNewsletter: boolean) => {
+    setIsSubmitting(true)
 
     if (onSubmit) {
       try {
-        await onSubmit({ email, experience })
+        await onSubmit({ email, experience: selectedExperience!, newsletter: wantsNewsletter })
         setIsSubmitting(false)
         localStorage.setItem('waitlist_submitted', 'true')
         setStep('success')
@@ -66,7 +70,7 @@ export function WaitlistCard({ onSubmit }: WaitlistCardProps) {
         const response = await fetch('/api/waitlist', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, experience })
+          body: JSON.stringify({ email, experience: selectedExperience, newsletter: wantsNewsletter })
         })
 
         setIsSubmitting(false)
@@ -89,9 +93,7 @@ export function WaitlistCard({ onSubmit }: WaitlistCardProps) {
   }
 
   const handleRetry = () => {
-    if (selectedExperience) {
-      handleExperienceSelect(selectedExperience)
-    }
+    setStep('newsletter')
   }
 
   if (hasSubmitted) return null
@@ -179,6 +181,31 @@ export function WaitlistCard({ onSubmit }: WaitlistCardProps) {
               className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg hover:border-gray-900 hover:bg-gray-50 transition-colors text-left disabled:opacity-50"
             >
               Actively using it
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Newsletter opt-in step */}
+      {step === 'newsletter' && (
+        <div>
+          <p className="text-sm text-gray-600 mb-3 font-sans">
+            Level up your natural language coding with a weekly email from Erik?
+          </p>
+          <div className="space-y-2">
+            <button
+              onClick={() => handleNewsletterChoice(true)}
+              disabled={isSubmitting}
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg hover:border-gray-900 hover:bg-gray-50 transition-colors text-left disabled:opacity-50"
+            >
+              Yes, sign me up
+            </button>
+            <button
+              onClick={() => handleNewsletterChoice(false)}
+              disabled={isSubmitting}
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg hover:border-gray-900 hover:bg-gray-50 transition-colors text-left disabled:opacity-50"
+            >
+              No thanks
             </button>
           </div>
         </div>
