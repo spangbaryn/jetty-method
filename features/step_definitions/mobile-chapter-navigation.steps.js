@@ -64,7 +64,8 @@ When('I tap a section link', async function () {
 
 When('I tap outside the drawer', async function () {
   const overlay = page.locator('[data-testid="mobile-nav-overlay"]');
-  await overlay.click();
+  // Click on the right side of the overlay, outside the drawer (drawer is 288px wide)
+  await overlay.click({ position: { x: 350, y: 300 } });
 });
 
 When('I tap the close button', async function () {
