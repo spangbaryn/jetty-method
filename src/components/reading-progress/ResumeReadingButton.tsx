@@ -4,11 +4,17 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { getReadingProgress, type ReadingProgress } from '@/lib/reading-progress'
 
+interface ResumeReadingButtonProps {
+  /** List of valid chapter slugs - used to validate saved progress */
+  chapterSlugs?: string[]
+}
+
 /**
  * Shows "Pick up where you left off" button on homepage
  * when user has reading progress saved in localStorage.
+ * Won't show if saved chapter no longer exists.
  */
-export function ResumeReadingButton() {
+export function ResumeReadingButton({ chapterSlugs = [] }: ResumeReadingButtonProps) {
   const [progress, setProgress] = useState<ReadingProgress | null>(null)
   const [mounted, setMounted] = useState(false)
 
@@ -20,6 +26,11 @@ export function ResumeReadingButton() {
 
   // Don't render anything during SSR or if no progress exists
   if (!mounted || !progress) {
+    return null
+  }
+
+  // Don't render if saved chapter no longer exists (and we have a chapter list to check)
+  if (chapterSlugs.length > 0 && !chapterSlugs.includes(progress.chapter)) {
     return null
   }
 
