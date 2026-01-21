@@ -40,4 +40,29 @@ Scenario: No resume button shown for first-time visitors
   Then I do not see a "Pick up where you left off" button
 
 # SPEED MODE: All success scenarios above
-# STABLE MODE: Will add edge cases (deleted sections, corrupted localStorage, etc.)
+
+# STABLE MODE SCENARIOS - Error Handling and Edge Cases
+
+Scenario: Gracefully handle corrupted localStorage data
+  Given my localStorage contains corrupted reading progress data
+  When I visit the home page
+  Then I do not see a "Pick up where you left off" button
+  And my corrupted progress is cleared
+
+Scenario: Gracefully handle localStorage unavailability
+  Given localStorage is unavailable
+  When I am on the chapter page for "the-jetty-method"
+  And I scroll past section "what-is-a-jetty"
+  Then no error is thrown
+  And the page continues to function normally
+
+Scenario: Handle saved chapter that no longer exists
+  Given I have previously read to "deleted-chapter" section "some-section"
+  When I visit the home page
+  Then I do not see a "Pick up where you left off" button
+
+Scenario: Handle saved section that no longer exists in chapter
+  Given I have previously read to "the-jetty-method" section "deleted-section"
+  When I visit the home page
+  Then I see a "Pick up where you left off" button under the tagline
+  And the button links to "/chapters/the-jetty-method#deleted-section"
