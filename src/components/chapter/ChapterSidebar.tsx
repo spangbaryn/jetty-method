@@ -1,5 +1,7 @@
 'use client'
 
+import { WaitlistCard } from '@/components/waitlist/WaitlistCard'
+
 interface SectionInfo {
   id: string
   title: string
@@ -71,6 +73,9 @@ export function ChapterSidebar({ bookTitle, currentSlug, chapters, sections, nex
           </a>
         </div>
       )}
+
+      {/* JettyPod Waitlist */}
+      <WaitlistCard />
     </aside>
   )
 }
