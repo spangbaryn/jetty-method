@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 
-type Step = 'email' | 'experience' | 'success' | 'duplicate'
+type Step = 'email' | 'experience' | 'success' | 'duplicate' | 'error'
 type ExperienceLevel = 'none' | 'some' | 'active'
 
 interface WaitlistSectionProps {
@@ -14,6 +14,7 @@ export function WaitlistSection({ onSubmit }: WaitlistSectionProps) {
   const [email, setEmail] = useState('')
   const [emailError, setEmailError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [selectedExperience, setSelectedExperience] = useState<ExperienceLevel | null>(null)
 
   const validateEmail = (email: string): string | null => {
     if (!email.trim()) {
@@ -39,27 +40,46 @@ export function WaitlistSection({ onSubmit }: WaitlistSectionProps) {
 
   const handleExperienceSelect = async (experience: ExperienceLevel) => {
     setIsSubmitting(true)
+    setSelectedExperience(experience)
 
     if (onSubmit) {
-      await onSubmit({ email, experience })
-      setIsSubmitting(false)
-      setStep('success')
+      try {
+        await onSubmit({ email, experience })
+        setIsSubmitting(false)
+        setStep('success')
+      } catch {
+        setIsSubmitting(false)
+        setStep('error')
+      }
     } else {
       // Default: POST to API
-      const response = await fetch('/api/waitlist', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, experience })
-      })
+      try {
+        const response = await fetch('/api/waitlist', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, experience })
+        })
 
-      setIsSubmitting(false)
+        setIsSubmitting(false)
 
-      const data = await response.json()
-      if (data.error === 'duplicate') {
-        setStep('duplicate')
-      } else {
-        setStep('success')
+        const data = await response.json()
+        if (data.error === 'duplicate') {
+          setStep('duplicate')
+        } else if (!response.ok) {
+          setStep('error')
+        } else {
+          setStep('success')
+        }
+      } catch {
+        setIsSubmitting(false)
+        setStep('error')
       }
+    }
+  }
+
+  const handleRetry = () => {
+    if (selectedExperience) {
+      handleExperienceSelect(selectedExperience)
     }
   }
 
@@ -177,6 +197,26 @@ export function WaitlistSection({ onSubmit }: WaitlistSectionProps) {
             <p className="text-gray-600 font-sans">
               We'll let you know when JettyPod is ready.
             </p>
+          </div>
+        )}
+
+        {/* Error state */}
+        {step === 'error' && (
+          <div data-testid="waitlist-error">
+            <div className="text-4xl mb-4">&#9888;</div>
+            <h3 className="text-xl font-semibold mb-2 font-serif">
+              Something went wrong
+            </h3>
+            <p className="text-gray-600 mb-4 font-sans">
+              We couldn't add you to the waitlist. Please try again.
+            </p>
+            <button
+              onClick={handleRetry}
+              data-testid="waitlist-retry-button"
+              className="px-6 py-3 bg-[#2c2c2c] text-white rounded-lg hover:bg-[#1a1a1a] transition-colors font-medium"
+            >
+              Try Again
+            </button>
           </div>
         )}
       </div>
