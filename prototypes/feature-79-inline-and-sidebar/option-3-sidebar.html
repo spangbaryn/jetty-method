@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Option 3: Sidebar Card - JettyPod Waitlist</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --font-serif: Georgia, 'Times New Roman', serif;
+      --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    body {
+      font-family: var(--font-serif);
+      background: #fffef9;
+      font-size: 1.125rem;
+      line-height: 1.75;
+    }
+    .font-caveat { font-family: 'Caveat', cursive; }
+    nav, button, input, select, textarea, .ui-element {
+      font-family: var(--font-sans);
+    }
+  </style>
+</head>
+<body>
+  <!-- Prototype Banner -->
+  <div style="background: #f0f0f0; border: 2px solid #333; padding: 16px; margin-bottom: 24px; font-family: monospace; font-size: 14px;">
+    <strong>PROTOTYPE</strong><br>
+    Feature: JettyPod Waitlist Signup<br>
+    Option: 3 - Sidebar Card (on chapter pages)<br>
+    Created: 2026-01-21<br>
+    Purpose: Show waitlist as compact card visible during reading
+  </div>
+
+  <!-- Chapter Page Layout -->
+  <div class="flex flex-col md:flex-row min-h-screen">
+    <!-- Sidebar -->
+    <aside class="w-full md:w-72 shrink-0 md:sticky md:top-0 md:h-screen overflow-y-auto p-6 md:py-12 md:pr-8 border-b md:border-b-0 border-gray-200">
+      <a href="#" class="inline-flex items-center gap-2.5 font-caveat text-2xl text-white bg-[#2c2c2c] px-5 py-3 rounded-lg no-underline mb-10 whitespace-nowrap">
+        <span class="text-lg">&#9776;</span>
+        The Jetty Method
+      </a>
+
+      <!-- Current chapter title -->
+      <div class="text-right">
+        <h2 class="text-2xl font-bold text-[#1a3a4a] leading-tight mb-6" style="border: none; padding: 0; margin: 0 0 1.5rem 0;">
+          The Problem with Vibe Coding
+        </h2>
+      </div>
+
+      <!-- Section links -->
+      <nav class="text-right mb-8">
+        <ul class="space-y-1.5">
+          <li><a href="#" class="block py-0.5 text-base italic text-[#1a3a4a] hover:underline">Why most AI-assisted projects fail</a></li>
+          <li><a href="#" class="block py-0.5 text-base italic text-[#1a3a4a] hover:underline">The missing methodology</a></li>
+          <li><a href="#" class="block py-0.5 text-base italic text-[#1a3a4a] hover:underline">A better approach</a></li>
+        </ul>
+      </nav>
+
+      <div class="mt-8 text-right">
+        <a href="#" class="block text-base text-[#1a3a4a] hover:underline">
+          Next: Speed, Stable, Production
+        </a>
+      </div>
+
+      <!-- WAITLIST CARD - THE PROTOTYPE -->
+      <div id="waitlist-card" class="mt-12 p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
+        <!-- Collapsed state -->
+        <div id="card-collapsed">
+          <p class="text-sm text-gray-600 mb-3 text-right" style="font-family: var(--font-sans);">
+            Implement the Jetty Method with JettyPod
+          </p>
+          <button
+            onclick="expandCard()"
+            class="w-full px-4 py-2 bg-[#2c2c2c] text-white text-sm rounded-lg hover:bg-[#1a1a1a] transition-colors"
+          >
+            Join waitlist
+          </button>
+        </div>
+
+        <!-- Expanded: Email step -->
+        <div id="card-step1" class="hidden">
+          <p class="text-sm text-gray-600 mb-3" style="font-family: var(--font-sans);">
+            JettyPod is a free tool for implementing the Jetty Method.
+          </p>
+          <form id="emailForm" class="space-y-2">
+            <input
+              type="email"
+              id="email"
+              placeholder="you@example.com"
+              required
+              class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
+            >
+            <button
+              type="submit"
+              class="w-full px-4 py-2 bg-[#2c2c2c] text-white text-sm rounded-lg hover:bg-[#1a1a1a] transition-colors"
+            >
+              Continue
+            </button>
+          </form>
+        </div>
+
+        <!-- Expanded: Experience step -->
+        <div id="card-step2" class="hidden">
+          <p class="text-sm text-gray-600 mb-3" style="font-family: var(--font-sans);">
+            Vibe coding experience?
+          </p>
+          <div class="space-y-2">
+            <button onclick="submitExperience('none')" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg hover:border-gray-900 hover:bg-gray-50 transition-colors text-left">
+              None yet
+            </button>
+            <button onclick="submitExperience('some')" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg hover:border-gray-900 hover:bg-gray-50 transition-colors text-left">
+              Some experiments
+            </button>
+            <button onclick="submitExperience('active')" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg hover:border-gray-900 hover:bg-gray-50 transition-colors text-left">
+              Actively using it
+            </button>
+          </div>
+        </div>
+
+        <!-- Success state -->
+        <div id="card-success" class="hidden text-center py-2">
+          <div class="text-2xl mb-1">&#10003;</div>
+          <p class="text-sm text-gray-600" style="font-family: var(--font-sans);">
+            You're on the list!
+          </p>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 max-w-2xl px-6 py-12 md:py-16">
+      <article class="prose prose-lg">
+        <p class="text-xl text-gray-600 italic mb-8" style="font-family: var(--font-serif);">
+          Why building with AI feels like magic—until it doesn't.
+        </p>
+
+        <p>
+          You've probably experienced it. You open Claude or ChatGPT, describe what you want to build, and within minutes you have working code. It's exhilarating. You think: "I could build anything."
+        </p>
+
+        <p>
+          Then you try to add a feature. Or fix a bug. Or make it work with real data. Suddenly, the magic disappears. The AI gives you code that breaks what was working. You spend hours debugging, going in circles, watching your project slowly fall apart.
+        </p>
+
+        <h2 style="font-size: 1.75rem; font-weight: 400; margin: 3rem 0 1.5rem; padding-left: 1.25rem; border-left: 4px solid #2c2c2c;">
+          Why most AI-assisted projects fail
+        </h2>
+
+        <p>
+          The problem isn't the AI. The problem is that "vibe coding"—the practice of describing what you want and hoping for the best—doesn't scale. It works for demos and prototypes. It falls apart for real software.
+        </p>
+
+        <p>
+          Real software needs to handle errors gracefully. It needs to work when users do unexpected things. It needs to be maintainable over time. None of these things happen by accident.
+        </p>
+
+        <h2 style="font-size: 1.75rem; font-weight: 400; margin: 3rem 0 1.5rem; padding-left: 1.25rem; border-left: 4px solid #2c2c2c;">
+          The missing methodology
+        </h2>
+
+        <p>
+          Professional software engineers have spent decades developing methodologies for building reliable software. They write tests. They handle errors. They think about edge cases. They refactor and improve.
+        </p>
+
+        <p>
+          What if you could apply those same principles—but with AI doing the heavy lifting? What if there was a framework that guided you from "vibe coding" to production-ready software?
+        </p>
+
+        <p>
+          That's what The Jetty Method provides.
+        </p>
+      </article>
+    </main>
+  </div>
+
+  <script>
+    function expandCard() {
+      document.getElementById('card-collapsed').classList.add('hidden');
+      document.getElementById('card-step1').classList.remove('hidden');
+    }
+
+    document.getElementById('emailForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      document.getElementById('card-step1').classList.add('hidden');
+      document.getElementById('card-step2').classList.remove('hidden');
+    });
+
+    function submitExperience(level) {
+      document.getElementById('card-step2').classList.add('hidden');
+      document.getElementById('card-success').classList.remove('hidden');
+      console.log('Submitted:', { email: document.getElementById('email').value, experience: level });
+    }
+  </script>
+</body>
+</html>

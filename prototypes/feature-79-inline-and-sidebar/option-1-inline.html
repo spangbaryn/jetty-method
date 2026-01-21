@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Option 1: Inline Section - JettyPod Waitlist</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --font-serif: Georgia, 'Times New Roman', serif;
+      --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    body {
+      font-family: var(--font-serif);
+      background: #fffef9;
+      font-size: 1.125rem;
+      line-height: 1.75;
+    }
+    .font-caveat { font-family: 'Caveat', cursive; }
+    nav, button, input, select, textarea, .ui-element {
+      font-family: var(--font-sans);
+    }
+  </style>
+</head>
+<body>
+  <!-- Prototype Banner -->
+  <div style="background: #f0f0f0; border: 2px solid #333; padding: 16px; margin-bottom: 24px; font-family: monospace; font-size: 14px;">
+    <strong>PROTOTYPE</strong><br>
+    Feature: JettyPod Waitlist Signup<br>
+    Option: 1 - Inline Section Below TOC<br>
+    Created: 2026-01-21<br>
+    Purpose: Show waitlist form as natural continuation of homepage content
+  </div>
+
+  <main class="min-h-screen max-w-3xl mx-auto px-6 py-16">
+    <!-- Book Header (simplified) -->
+    <header class="mb-16 text-center">
+      <div class="w-32 h-32 bg-gray-200 rounded-full mx-auto mb-8 flex items-center justify-center text-gray-400">[Logo]</div>
+      <h1 class="text-5xl font-bold mb-6" style="font-family: var(--font-serif);">The Jetty Method</h1>
+      <p class="text-xl text-gray-600 italic" style="font-family: var(--font-serif);">
+        A practical framework for building real software with AI—without an engineering background.
+      </p>
+    </header>
+
+    <!-- Table of Contents (mock) -->
+    <nav class="mb-16">
+      <ul class="space-y-6">
+        <li>
+          <a href="#" class="text-xl font-semibold text-gray-900 hover:text-blue-600 hover:underline block" style="font-family: var(--font-serif);">
+            Chapter 1: The Problem with Vibe Coding
+          </a>
+          <ul class="mt-2 ml-8 space-y-1">
+            <li><a href="#" class="text-base text-gray-700 hover:text-blue-600 hover:underline">Why most AI-assisted projects fail</a></li>
+            <li><a href="#" class="text-base text-gray-700 hover:text-blue-600 hover:underline">The missing methodology</a></li>
+          </ul>
+        </li>
+        <li>
+          <a href="#" class="text-xl font-semibold text-gray-900 hover:text-blue-600 hover:underline block" style="font-family: var(--font-serif);">
+            Chapter 2: Speed, Stable, Production
+          </a>
+          <ul class="mt-2 ml-8 space-y-1">
+            <li><a href="#" class="text-base text-gray-700 hover:text-blue-600 hover:underline">The three modes</a></li>
+            <li><a href="#" class="text-base text-gray-700 hover:text-blue-600 hover:underline">When to use each</a></li>
+          </ul>
+        </li>
+        <li>
+          <a href="#" class="text-xl font-semibold text-gray-900 hover:text-blue-600 hover:underline block" style="font-family: var(--font-serif);">
+            Chapter 3: Your First Feature
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- WAITLIST SECTION - THE PROTOTYPE -->
+    <section id="waitlist-section" class="border-t border-gray-200 pt-12 mt-8">
+      <div class="max-w-md mx-auto text-center">
+        <!-- Step 1: Email -->
+        <div id="step1">
+          <h2 class="text-2xl font-bold mb-3" style="font-family: var(--font-serif); border: none; padding: 0; margin-bottom: 0.75rem;">
+            JettyPod
+          </h2>
+          <p class="text-gray-600 mb-6" style="font-family: var(--font-sans);">
+            A free tool for implementing the Jetty Method.<br>Join the waitlist.
+          </p>
+          <form id="emailForm" class="flex gap-3">
+            <input
+              type="email"
+              id="email"
+              placeholder="you@example.com"
+              required
+              class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+            >
+            <button
+              type="submit"
+              class="px-6 py-3 bg-[#2c2c2c] text-white rounded-lg hover:bg-[#1a1a1a] transition-colors font-medium"
+            >
+              Join
+            </button>
+          </form>
+        </div>
+
+        <!-- Step 2: Vibe Coding Experience (hidden initially) -->
+        <div id="step2" class="hidden">
+          <p class="text-gray-600 mb-4" style="font-family: var(--font-sans);">
+            One quick question:
+          </p>
+          <h3 class="text-xl font-semibold mb-6" style="font-family: var(--font-serif);">
+            How much experience do you have with vibe coding?
+          </h3>
+          <div class="space-y-3">
+            <button onclick="submitExperience('none')" class="w-full px-4 py-3 border border-gray-300 rounded-lg hover:border-gray-900 hover:bg-gray-50 transition-colors text-left">
+              <span class="font-medium">None yet</span>
+              <span class="text-gray-500 text-sm block">I'm curious but haven't tried it</span>
+            </button>
+            <button onclick="submitExperience('some')" class="w-full px-4 py-3 border border-gray-300 rounded-lg hover:border-gray-900 hover:bg-gray-50 transition-colors text-left">
+              <span class="font-medium">Some experiments</span>
+              <span class="text-gray-500 text-sm block">I've played around with AI coding tools</span>
+            </button>
+            <button onclick="submitExperience('active')" class="w-full px-4 py-3 border border-gray-300 rounded-lg hover:border-gray-900 hover:bg-gray-50 transition-colors text-left">
+              <span class="font-medium">Actively using it</span>
+              <span class="text-gray-500 text-sm block">I build things with AI regularly</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 3: Success (hidden initially) -->
+        <div id="step3" class="hidden">
+          <div class="text-4xl mb-4">&#10003;</div>
+          <h3 class="text-xl font-semibold mb-2" style="font-family: var(--font-serif);">
+            You're on the list!
+          </h3>
+          <p class="text-gray-600" style="font-family: var(--font-sans);">
+            We'll let you know when JettyPod is ready.
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    document.getElementById('emailForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      document.getElementById('step1').classList.add('hidden');
+      document.getElementById('step2').classList.remove('hidden');
+    });
+
+    function submitExperience(level) {
+      document.getElementById('step2').classList.add('hidden');
+      document.getElementById('step3').classList.remove('hidden');
+      console.log('Submitted:', { email: document.getElementById('email').value, experience: level });
+    }
+  </script>
+</body>
+</html>
