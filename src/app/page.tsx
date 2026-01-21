@@ -2,6 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { getAllChapters } from '@/lib/content'
 import { WaitlistSection } from '@/components/waitlist/WaitlistSection'
+import { ResumeReadingButton } from '@/components/reading-progress'
 
 const BOOK_TITLE = 'The Jetty Method'
 const BOOK_TAGLINE = 'A practical framework for building real software with AI—without an engineering background.'
@@ -33,6 +34,7 @@ export default async function Home() {
         >
           {BOOK_TAGLINE}
         </p>
+        <ResumeReadingButton />
       </header>
 
       {/* Table of Contents */}

@@ -1,6 +1,7 @@
 import { ChapterTitle, ChapterIntro, SectionHeading, ChapterSidebar } from '@/components/chapter'
 import { PortableText } from '@/components/portable-text'
 import { getAllChapters, getChapterBySlug, getChapterSlugs, type Chapter } from '@/lib/content'
+import { ReadingProgressTracker } from '@/components/reading-progress'
 
 const BOOK_TITLE = 'The Jetty Method'
 
@@ -83,6 +84,11 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
             )
           })}
         </article>
+        <ReadingProgressTracker
+          chapterSlug={slug}
+          sectionIds={sectionList.map((s) => s.id)}
+          chapterOrder={chapterList.map((c) => c.slug)}
+        />
       </main>
     </div>
   )
