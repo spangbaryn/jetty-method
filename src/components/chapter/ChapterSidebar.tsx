@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { WaitlistCard } from '@/components/waitlist/WaitlistCard'
 
 interface SectionInfo {
@@ -21,13 +22,108 @@ interface ChapterSidebarProps {
 }
 
 export function ChapterSidebar({ bookTitle, currentSlug, chapters, sections, nextChapter }: ChapterSidebarProps) {
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const currentChapter = chapters.find((c) => c.slug === currentSlug)
 
+  const handleSectionClick = () => {
+    setIsDrawerOpen(false)
+  }
+
   return (
-    <aside
-      data-testid="chapter-sidebar"
-      className="w-full md:w-72 shrink-0 md:sticky md:top-0 md:h-screen overflow-y-auto p-6 md:py-12 md:pr-8 border-b md:border-b-0 border-gray-200"
-    >
+    <>
+      {/* Mobile hamburger button */}
+      <button
+        data-testid="mobile-menu-button"
+        onClick={() => setIsDrawerOpen(true)}
+        className="md:hidden fixed top-4 left-4 z-40 p-2 bg-[#2c2c2c] text-white rounded-lg"
+        aria-label="Open navigation menu"
+      >
+        <span className="text-xl">☰</span>
+      </button>
+
+      {/* Mobile drawer overlay */}
+      {isDrawerOpen && (
+        <div
+          data-testid="mobile-nav-overlay"
+          onClick={() => setIsDrawerOpen(false)}
+          className="md:hidden fixed inset-0 bg-black/50 z-40"
+        />
+      )}
+
+      {/* Mobile navigation drawer - conditionally rendered */}
+      {isDrawerOpen && (
+        <div
+          data-testid="mobile-nav-drawer"
+          className="md:hidden fixed top-0 left-0 h-full w-72 bg-white z-50"
+        >
+          <div className="p-6 h-full overflow-y-auto">
+            {/* Close button */}
+            <button
+              data-testid="mobile-nav-close"
+              onClick={() => setIsDrawerOpen(false)}
+              className="absolute top-4 right-4 p-2 text-gray-600 hover:text-gray-900"
+              aria-label="Close navigation menu"
+            >
+              <span className="text-xl">✕</span>
+            </button>
+
+            {/* Book title */}
+            <a
+              href="/"
+              data-testid="sidebar-book-title"
+              className="inline-flex items-center gap-2.5 font-caveat text-2xl text-white bg-[#2c2c2c] px-5 py-3 rounded-lg no-underline mb-10 whitespace-nowrap"
+            >
+              <span className="text-lg">☰</span>
+              {bookTitle}
+            </a>
+
+            {/* Current chapter title */}
+            <div className="text-right">
+              <h2 className="text-2xl font-bold text-[#1a3a4a] leading-tight mb-6 border-none p-0 m-0">
+                {currentChapter?.title}
+              </h2>
+            </div>
+
+            {/* Section links */}
+            {sections.length > 0 && (
+              <nav data-testid="section-toc" className="text-right">
+                <ul className="space-y-1.5">
+                  {sections.map((section) => (
+                    <li key={section.id}>
+                      <a
+                        href={`#${section.id}`}
+                        onClick={handleSectionClick}
+                        className="block py-0.5 text-base italic text-[#1a3a4a] hover:underline"
+                      >
+                        {section.title}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            )}
+
+            {nextChapter && (
+              <div className="mt-8 text-right">
+                <a
+                  href={`/chapters/${nextChapter.slug}`}
+                  className="block text-base text-[#1a3a4a] hover:underline"
+                >
+                  Next: {nextChapter.title}
+                </a>
+              </div>
+            )}
+
+            <WaitlistCard />
+          </div>
+        </div>
+      )}
+
+      {/* Desktop sidebar */}
+      <aside
+        data-testid="chapter-sidebar"
+        className="hidden md:block w-72 shrink-0 sticky top-0 h-screen overflow-y-auto py-12 pr-8 border-gray-200"
+      >
       <a
         href="/"
         data-testid="sidebar-book-title"
@@ -77,5 +173,6 @@ export function ChapterSidebar({ bookTitle, currentSlug, chapters, sections, nex
       {/* JettyPod Waitlist */}
       <WaitlistCard />
     </aside>
+    </>
   )
 }
