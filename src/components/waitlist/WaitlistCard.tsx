@@ -111,7 +111,7 @@ export function WaitlistCard({ onSubmit }: WaitlistCardProps) {
       {step === 'email' && (
         <div>
           <p className="text-sm text-gray-600 mb-3 font-sans">
-            JettyPod is a free tool for implementing the Jetty Method.
+            Reserve your spot.
           </p>
           <form onSubmit={handleEmailSubmit} className="space-y-2">
             <input
