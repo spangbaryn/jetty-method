@@ -1,47 +1,42 @@
 import { NextResponse } from 'next/server'
-import { promises as fs } from 'fs'
-import path from 'path'
 
-interface WaitlistEntry {
-  email: string
-  experience: 'none' | 'some' | 'active'
-  timestamp: string
-}
-
-const DATA_FILE = path.join(process.cwd(), 'data', 'waitlist.json')
-
-async function readWaitlist(): Promise<WaitlistEntry[]> {
-  try {
-    const data = await fs.readFile(DATA_FILE, 'utf-8')
-    return JSON.parse(data)
-  } catch {
-    return []
-  }
-}
-
-async function writeWaitlist(entries: WaitlistEntry[]): Promise<void> {
-  await fs.mkdir(path.dirname(DATA_FILE), { recursive: true })
-  await fs.writeFile(DATA_FILE, JSON.stringify(entries, null, 2))
-}
+const MAILERLITE_API_KEY = process.env.MAILERLITE_API_KEY
+const MAILERLITE_GROUP_ID = process.env.MAILERLITE_GROUP_ID
 
 export async function POST(request: Request) {
   const { email, experience } = await request.json()
 
-  const entries = await readWaitlist()
+  if (!MAILERLITE_API_KEY || !MAILERLITE_GROUP_ID) {
+    console.error('MailerLite environment variables not configured')
+    return NextResponse.json({ success: false, error: 'server_error' }, { status: 500 })
+  }
 
-  // Check for duplicate email
-  const isDuplicate = entries.some(entry => entry.email.toLowerCase() === email.toLowerCase())
-  if (isDuplicate) {
+  const response = await fetch('https://connect.mailerlite.com/api/subscribers', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${MAILERLITE_API_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      email,
+      groups: [MAILERLITE_GROUP_ID],
+      fields: {
+        experience: experience
+      }
+    })
+  })
+
+  const data = await response.json()
+
+  // MailerLite returns 422 with error for existing subscribers
+  if (response.status === 422 && data.message?.includes('already')) {
     return NextResponse.json({ success: false, error: 'duplicate' }, { status: 409 })
   }
 
-  entries.push({
-    email,
-    experience,
-    timestamp: new Date().toISOString()
-  })
-
-  await writeWaitlist(entries)
+  if (!response.ok) {
+    console.error('MailerLite API error:', data)
+    return NextResponse.json({ success: false, error: 'server_error' }, { status: 500 })
+  }
 
   return NextResponse.json({ success: true })
 }
