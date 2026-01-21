@@ -12,7 +12,19 @@ interface WaitlistCardProps {
 export function WaitlistCard({ onSubmit }: WaitlistCardProps) {
   const [step, setStep] = useState<Step>('collapsed')
   const [email, setEmail] = useState('')
+  const [emailError, setEmailError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const validateEmail = (email: string): string | null => {
+    if (!email.trim()) {
+      return 'Email is required'
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      return 'Please enter a valid email address'
+    }
+    return null
+  }
 
   const handleExpand = () => {
     setStep('email')
@@ -20,6 +32,12 @@ export function WaitlistCard({ onSubmit }: WaitlistCardProps) {
 
   const handleEmailSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    const error = validateEmail(email)
+    if (error) {
+      setEmailError(error)
+      return
+    }
+    setEmailError('')
     setStep('experience')
   }
 
@@ -69,13 +87,23 @@ export function WaitlistCard({ onSubmit }: WaitlistCardProps) {
           </p>
           <form onSubmit={handleEmailSubmit} className="space-y-2">
             <input
-              type="email"
+              type="text"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setEmail(e.target.value)
+                if (emailError) setEmailError('')
+              }}
               placeholder="you@example.com"
-              required
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
+              data-testid="waitlist-email-input"
+              className={`w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 ${
+                emailError ? 'border-red-500' : 'border-gray-300'
+              }`}
             />
+            {emailError && (
+              <p data-testid="waitlist-email-error" className="text-red-500 text-sm">
+                {emailError}
+              </p>
+            )}
             <button
               type="submit"
               className="w-full px-4 py-2 bg-[#2c2c2c] text-white text-sm rounded-lg hover:bg-[#1a1a1a] transition-colors"
