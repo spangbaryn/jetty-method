@@ -39,3 +39,30 @@ Scenario: User closes drawer with close button
 Scenario: Sidebar shows normally on desktop
   Given I am on a chapter page on a desktop device
   Then I see the sidebar visible without a hamburger menu
+
+# STABLE MODE SCENARIOS - Error Handling and Edge Cases
+
+Scenario: Drawer handles chapter with no sections
+  Given I am on a chapter page with no sections on a mobile device
+  When I tap the hamburger menu icon
+  Then I see the navigation drawer
+  And I see the book title
+  And I see the current chapter title
+  But I do not see any section links
+
+Scenario: Drawer handles last chapter without next chapter link
+  Given I am on the last chapter on a mobile device
+  When I tap the hamburger menu icon
+  Then I see the navigation drawer
+  But I do not see a next chapter link
+
+Scenario: Drawer closes when pressing Escape key
+  Given the navigation drawer is open
+  When I press the Escape key
+  Then the drawer closes
+
+Scenario: Drawer state resets on viewport resize to desktop
+  Given the navigation drawer is open
+  When the viewport is resized to desktop width
+  Then the hamburger menu is not visible
+  And the sidebar is visible normally
