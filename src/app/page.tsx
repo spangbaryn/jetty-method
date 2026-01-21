@@ -34,7 +34,7 @@ export default async function Home() {
         >
           {BOOK_TAGLINE}
         </p>
-        <ResumeReadingButton />
+        <ResumeReadingButton chapterSlugs={chapters.map(c => c.slug.current)} />
       </header>
 
       {/* Table of Contents */}
