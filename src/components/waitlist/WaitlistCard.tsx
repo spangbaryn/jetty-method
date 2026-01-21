@@ -95,7 +95,7 @@ export function WaitlistCard({ onSubmit }: WaitlistCardProps) {
       {step === 'collapsed' && (
         <div>
           <p className="text-sm text-gray-600 mb-3 text-center font-sans">
-            Implement the Jetty Method with JettyPod
+            Implement the Jetty Method for free with JettyPod
           </p>
           <button
             onClick={handleExpand}
