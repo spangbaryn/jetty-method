@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 
-type Step = 'email' | 'experience' | 'success'
+type Step = 'email' | 'experience' | 'success' | 'duplicate'
 type ExperienceLevel = 'none' | 'some' | 'active'
 
 interface WaitlistSectionProps {
@@ -42,17 +42,25 @@ export function WaitlistSection({ onSubmit }: WaitlistSectionProps) {
 
     if (onSubmit) {
       await onSubmit({ email, experience })
+      setIsSubmitting(false)
+      setStep('success')
     } else {
       // Default: POST to API
-      await fetch('/api/waitlist', {
+      const response = await fetch('/api/waitlist', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, experience })
       })
-    }
 
-    setIsSubmitting(false)
-    setStep('success')
+      setIsSubmitting(false)
+
+      const data = await response.json()
+      if (data.error === 'duplicate') {
+        setStep('duplicate')
+      } else {
+        setStep('success')
+      }
+    }
   }
 
   return (
@@ -152,6 +160,19 @@ export function WaitlistSection({ onSubmit }: WaitlistSectionProps) {
             <div className="text-4xl mb-4">&#10003;</div>
             <h3 className="text-xl font-semibold mb-2 font-serif">
               You're on the list!
+            </h3>
+            <p className="text-gray-600 font-sans">
+              We'll let you know when JettyPod is ready.
+            </p>
+          </div>
+        )}
+
+        {/* Duplicate email message */}
+        {step === 'duplicate' && (
+          <div data-testid="waitlist-duplicate-message">
+            <div className="text-4xl mb-4">&#10003;</div>
+            <h3 className="text-xl font-semibold mb-2 font-serif">
+              You're already on the list!
             </h3>
             <p className="text-gray-600 font-sans">
               We'll let you know when JettyPod is ready.
