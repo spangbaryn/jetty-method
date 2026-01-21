@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 type Step = 'collapsed' | 'email' | 'experience' | 'success' | 'duplicate' | 'error'
 type ExperienceLevel = 'none' | 'some' | 'active'
@@ -15,6 +15,11 @@ export function WaitlistCard({ onSubmit }: WaitlistCardProps) {
   const [emailError, setEmailError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [selectedExperience, setSelectedExperience] = useState<ExperienceLevel | null>(null)
+  const [hasSubmitted, setHasSubmitted] = useState(true) // Start true to prevent flash
+
+  useEffect(() => {
+    setHasSubmitted(localStorage.getItem('waitlist_submitted') === 'true')
+  }, [])
 
   const validateEmail = (email: string): string | null => {
     if (!email.trim()) {
@@ -50,6 +55,7 @@ export function WaitlistCard({ onSubmit }: WaitlistCardProps) {
       try {
         await onSubmit({ email, experience })
         setIsSubmitting(false)
+        localStorage.setItem('waitlist_submitted', 'true')
         setStep('success')
       } catch {
         setIsSubmitting(false)
@@ -67,10 +73,12 @@ export function WaitlistCard({ onSubmit }: WaitlistCardProps) {
 
         const data = await response.json()
         if (data.error === 'duplicate') {
+          localStorage.setItem('waitlist_submitted', 'true')
           setStep('duplicate')
         } else if (!response.ok) {
           setStep('error')
         } else {
+          localStorage.setItem('waitlist_submitted', 'true')
           setStep('success')
         }
       } catch {
@@ -85,6 +93,8 @@ export function WaitlistCard({ onSubmit }: WaitlistCardProps) {
       handleExperienceSelect(selectedExperience)
     }
   }
+
+  if (hasSubmitted) return null
 
   return (
     <div
