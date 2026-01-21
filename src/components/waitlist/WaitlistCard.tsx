@@ -190,7 +190,16 @@ export function WaitlistCard({ onSubmit }: WaitlistCardProps) {
       {step === 'newsletter' && (
         <div>
           <p className="text-sm text-gray-600 mb-3 font-sans">
-            Level up your natural language coding with a weekly email from Erik?
+            Level up your natural language coding with a weekly email from{' '}
+            <a
+              href="https://www.linkedin.com/in/espangenberg/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-900 underline hover:text-gray-600"
+            >
+              Erik
+            </a>
+            ?
           </p>
           <div className="space-y-2">
             <button
