@@ -38,4 +38,35 @@ Scenario: User completes waitlist signup
   And my signup is recorded
 
 # SPEED MODE: All scenarios above (integration + success paths)
-# STABLE MODE: Will add validation errors, duplicate email handling, network failures
+
+# STABLE MODE SCENARIOS - Error Handling and Edge Cases
+
+Scenario: User submits invalid email format
+  Given I am on the homepage
+  And I see the waitlist form
+  When I enter an invalid email address
+  And I click the join button
+  Then I see an email validation error
+  And I remain on the email step
+
+Scenario: User submits empty email
+  Given I am on the homepage
+  And I see the waitlist form
+  When I click the join button without entering email
+  Then I see a required field error
+  And I remain on the email step
+
+Scenario: User tries to sign up with duplicate email
+  Given I am on the homepage
+  And I have already signed up with my email
+  When I try to sign up again with the same email
+  Then I see a duplicate email message
+  And I am not added to the waitlist again
+
+Scenario: API failure during signup
+  Given I have entered my email
+  And I see the experience question
+  And the API is unavailable
+  When I select my vibe coding experience level
+  Then I see an error message
+  And I can retry the submission
