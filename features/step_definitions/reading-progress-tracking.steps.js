@@ -98,3 +98,51 @@ Then('my reading progress remains {string} section {string}', async function (ch
   expect(progress.chapter).toBe(chapter);
   expect(progress.section).toBe(section);
 });
+
+// STABLE MODE STEP DEFINITIONS - Error Handling and Edge Cases
+
+Given('my localStorage contains corrupted reading progress data', async function () {
+  await this.page.goto(BASE_URL);
+  await this.page.evaluate((key) => {
+    localStorage.setItem(key, 'not-valid-json{{{');
+  }, STORAGE_KEY);
+});
+
+Given('localStorage is unavailable', async function () {
+  await this.page.goto(BASE_URL);
+  // Mock localStorage to throw errors
+  await this.page.evaluate(() => {
+    const originalSetItem = localStorage.setItem.bind(localStorage);
+    const originalGetItem = localStorage.getItem.bind(localStorage);
+
+    Storage.prototype.setItem = function() {
+      throw new Error('localStorage is unavailable');
+    };
+    Storage.prototype.getItem = function() {
+      throw new Error('localStorage is unavailable');
+    };
+  });
+});
+
+Then('my corrupted progress is cleared', async function () {
+  const progress = await this.page.evaluate((key) => {
+    return localStorage.getItem(key);
+  }, STORAGE_KEY);
+  // Should be null (cleared) or valid JSON (reset)
+  if (progress !== null) {
+    // If not null, should be valid JSON
+    expect(() => JSON.parse(progress)).not.toThrow();
+  }
+});
+
+Then('no error is thrown', async function () {
+  // Check that no uncaught errors occurred
+  const errors = await this.page.evaluate(() => window.__testErrors || []);
+  expect(errors.length).toBe(0);
+});
+
+Then('the page continues to function normally', async function () {
+  // Verify page is still interactive
+  const main = this.page.locator('main');
+  await expect(main).toBeVisible();
+});
