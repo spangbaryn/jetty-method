@@ -12,8 +12,8 @@ export const metadata: Metadata = {
   title: 'The Jetty Method',
   description: 'A software development methodology for building with Claude Code',
   icons: {
-    icon: '/jetty-method-logo.png',
-    apple: '/jetty-method-logo.png',
+    icon: '/favicon.png',
+    apple: '/favicon.png',
   },
 }
 
