@@ -3,9 +3,9 @@ import Link from 'next/link'
 import { getAllChapters } from '@/lib/content'
 import { WaitlistSection } from '@/components/waitlist/WaitlistSection'
 import { ResumeReadingButton } from '@/components/reading-progress'
+import { Highlight } from '@/components/content/Highlight'
 
 const BOOK_TITLE = 'The Jetty Method'
-const BOOK_TAGLINE = 'A practical framework for building real software with AI—without an engineering background.'
 
 export default async function Home() {
   const chapters = await getAllChapters()
@@ -32,7 +32,7 @@ export default async function Home() {
           className="text-xl text-gray-600 font-serif italic"
           data-testid="book-tagline"
         >
-          {BOOK_TAGLINE}
+          A practical framework for building real software with AI—<Highlight>without an engineering background</Highlight>.
         </p>
         <p className="mt-4 text-gray-500 font-sans">
           by{' '}
