@@ -54,14 +54,14 @@ export function ChapterSidebar({ bookTitle, currentSlug, chapters, sections, nex
       {isDrawerOpen && (
         <div
           data-testid="mobile-nav-drawer"
-          className="md:hidden fixed top-0 left-0 h-full w-72 bg-white z-50"
+          className="md:hidden fixed top-0 right-0 h-full w-72 bg-white z-50"
         >
           <div className="p-6 h-full overflow-y-auto">
             {/* Close button */}
             <button
               data-testid="mobile-nav-close"
               onClick={() => setIsDrawerOpen(false)}
-              className="absolute top-4 right-4 p-2 text-gray-600 hover:text-gray-900"
+              className="absolute top-4 left-4 p-2 text-gray-600 hover:text-gray-900"
               aria-label="Close navigation menu"
             >
               <span className="text-xl">✕</span>
