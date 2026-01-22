@@ -363,16 +363,19 @@ export function parseContent(raw: string): PortableTextBlock[] {
         content += '\n' + lines[i]
         i++
       }
-      if (i < lines.length) {
+      // Only create prompt if closing @@@ was found
+      if (i < lines.length && lines[i].endsWith(' @@@')) {
         content += '\n' + lines[i].slice(0, -4)
         i++
+        blocks.push({
+          _type: 'prompt',
+          _key: generateKey(),
+          text: content.trim(),
+        })
+        continue
       }
-      blocks.push({
-        _type: 'prompt',
-        _key: generateKey(),
-        text: content.trim(),
-      })
-      continue
+      // Unclosed prompt - treat opening line as regular text, rewind
+      i = i - (content.split('\n').length - 1) - 1
     }
 
     // Regular paragraph
