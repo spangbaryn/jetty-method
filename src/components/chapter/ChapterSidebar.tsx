@@ -114,13 +114,15 @@ export function ChapterSidebar({ bookTitle, currentSlug, chapters, sections, nex
         data-testid="chapter-sidebar"
         className="hidden md:block w-72 shrink-0 sticky top-0 h-screen overflow-y-auto py-12 pr-8 border-gray-200"
       >
-      <a
-        href="/"
-        data-testid="sidebar-book-title"
-        className="inline-flex items-center font-caveat text-2xl text-white bg-[#2c2c2c] px-5 py-3 rounded-lg no-underline mb-10 whitespace-nowrap"
-      >
-        {bookTitle}
-      </a>
+      <div className="text-right">
+        <a
+          href="/"
+          data-testid="sidebar-book-title"
+          className="inline-flex items-center font-caveat text-2xl text-white bg-[#2c2c2c] px-5 py-3 rounded-lg no-underline mb-10 whitespace-nowrap"
+        >
+          {bookTitle}
+        </a>
+      </div>
 
       {/* Current chapter title */}
       <div data-testid="chapter-list" className="text-right">
