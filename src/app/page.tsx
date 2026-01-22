@@ -51,11 +51,13 @@ export default async function Home() {
       {/* Table of Contents */}
       <nav data-testid="table-of-contents">
         <ul className="space-y-6">
-          {chapters.map((chapter) => (
-            <li key={chapter.slug.current} data-testid="toc-chapter">
+          {chapters.map((chapter) => {
+            const isPart = chapter.title.toUpperCase().startsWith('PART')
+            return (
+            <li key={chapter.slug.current} data-testid="toc-chapter" className={isPart ? 'mt-10 first:mt-0' : ''}>
               <Link
                 href={`/chapters/${chapter.slug.current}`}
-                className="text-xl font-serif font-semibold text-gray-900 hover:text-blue-600 hover:underline transition-colors block focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded"
+                className={`font-serif font-semibold text-gray-900 hover:text-blue-600 hover:underline transition-colors block focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded ${isPart ? 'text-2xl' : 'text-xl'}`}
               >
                 {chapter.title}
               </Link>
