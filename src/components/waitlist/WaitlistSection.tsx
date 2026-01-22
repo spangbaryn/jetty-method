@@ -2,11 +2,10 @@
 
 import { useState, useEffect } from 'react'
 
-type Step = 'email' | 'experience' | 'newsletter' | 'success' | 'duplicate' | 'error'
-type ExperienceLevel = 'none' | 'some' | 'active'
+type Step = 'email' | 'newsletter' | 'success' | 'duplicate' | 'error'
 
 interface WaitlistSectionProps {
-  onSubmit?: (data: { email: string; experience: ExperienceLevel; newsletter: boolean }) => Promise<void>
+  onSubmit?: (data: { email: string; newsletter: boolean }) => Promise<void>
 }
 
 export function WaitlistSection({ onSubmit }: WaitlistSectionProps) {
@@ -14,7 +13,6 @@ export function WaitlistSection({ onSubmit }: WaitlistSectionProps) {
   const [email, setEmail] = useState('')
   const [emailError, setEmailError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [selectedExperience, setSelectedExperience] = useState<ExperienceLevel | null>(null)
   const [hasSubmitted, setHasSubmitted] = useState(true) // Start true to prevent flash
 
   useEffect(() => {
@@ -40,11 +38,6 @@ export function WaitlistSection({ onSubmit }: WaitlistSectionProps) {
       return
     }
     setEmailError('')
-    setStep('experience')
-  }
-
-  const handleExperienceSelect = (experience: ExperienceLevel) => {
-    setSelectedExperience(experience)
     setStep('newsletter')
   }
 
@@ -53,7 +46,7 @@ export function WaitlistSection({ onSubmit }: WaitlistSectionProps) {
 
     if (onSubmit) {
       try {
-        await onSubmit({ email, experience: selectedExperience!, newsletter: wantsNewsletter })
+        await onSubmit({ email, newsletter: wantsNewsletter })
         setIsSubmitting(false)
         localStorage.setItem('waitlist_submitted', 'true')
         setStep('success')
@@ -66,7 +59,7 @@ export function WaitlistSection({ onSubmit }: WaitlistSectionProps) {
         const response = await fetch('/api/waitlist', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, experience: selectedExperience, newsletter: wantsNewsletter })
+          body: JSON.stringify({ email, newsletter: wantsNewsletter })
         })
 
         setIsSubmitting(false)
@@ -141,51 +134,7 @@ export function WaitlistSection({ onSubmit }: WaitlistSectionProps) {
           </div>
         )}
 
-        {/* Step 2: Experience Question */}
-        {step === 'experience' && (
-          <div data-testid="waitlist-experience-step">
-            <p className="text-gray-600 mb-4 font-sans">
-              One quick question:
-            </p>
-            <h3 className="text-xl font-semibold mb-6 font-serif">
-              How much experience do you have with vibe coding?
-            </h3>
-            <div className="space-y-3">
-              <button
-                onClick={() => handleExperienceSelect('none')}
-                disabled={isSubmitting}
-                data-testid="waitlist-experience-option"
-                data-value="none"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg hover:border-gray-900 hover:bg-gray-50 transition-colors text-left disabled:opacity-50"
-              >
-                <span className="font-medium">None yet</span>
-                <span className="text-gray-500 text-sm block">I'm curious but haven't tried it</span>
-              </button>
-              <button
-                onClick={() => handleExperienceSelect('some')}
-                disabled={isSubmitting}
-                data-testid="waitlist-experience-option"
-                data-value="some"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg hover:border-gray-900 hover:bg-gray-50 transition-colors text-left disabled:opacity-50"
-              >
-                <span className="font-medium">Some experiments</span>
-                <span className="text-gray-500 text-sm block">I've played around with AI coding tools</span>
-              </button>
-              <button
-                onClick={() => handleExperienceSelect('active')}
-                disabled={isSubmitting}
-                data-testid="waitlist-experience-option"
-                data-value="active"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg hover:border-gray-900 hover:bg-gray-50 transition-colors text-left disabled:opacity-50"
-              >
-                <span className="font-medium">Actively using it</span>
-                <span className="text-gray-500 text-sm block">I build things with AI regularly</span>
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Step 3: Newsletter Question */}
+        {/* Step 2: Newsletter Question */}
         {step === 'newsletter' && (
           <div data-testid="waitlist-newsletter-step">
             <p className="text-gray-600 mb-4 font-sans">
@@ -217,7 +166,7 @@ export function WaitlistSection({ onSubmit }: WaitlistSectionProps) {
           </div>
         )}
 
-        {/* Step 4: Success */}
+        {/* Step 3: Success */}
         {step === 'success' && (
           <div data-testid="waitlist-success">
             <div className="text-4xl mb-4">&#10003;</div>

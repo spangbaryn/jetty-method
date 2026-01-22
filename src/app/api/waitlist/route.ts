@@ -18,6 +18,12 @@ export async function POST(request: Request) {
     groups.push(NEWSLETTER_GROUP_ID)
   }
 
+  // Build fields object - only include experience if provided
+  const fields: Record<string, string> = {}
+  if (experience) {
+    fields.experience = experience
+  }
+
   const response = await fetch('https://connect.mailerlite.com/api/subscribers', {
     method: 'POST',
     headers: {
@@ -27,9 +33,7 @@ export async function POST(request: Request) {
     body: JSON.stringify({
       email,
       groups,
-      fields: {
-        experience: experience
-      }
+      ...(Object.keys(fields).length > 0 && { fields })
     })
   })
 
