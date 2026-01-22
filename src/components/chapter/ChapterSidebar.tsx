@@ -31,14 +31,14 @@ export function ChapterSidebar({ bookTitle, currentSlug, chapters, sections, nex
 
   return (
     <>
-      {/* Mobile hamburger button - fixed square on right side */}
+      {/* Mobile menu button - toggles between hamburger and X */}
       <button
         data-testid="mobile-menu-button"
-        onClick={() => setIsDrawerOpen(true)}
+        onClick={() => setIsDrawerOpen(!isDrawerOpen)}
         className="md:hidden fixed top-4 right-4 z-[9999] w-10 h-10 flex items-center justify-center bg-[#2c2c2c] text-white rounded-lg shadow-lg"
-        aria-label="Open navigation menu"
+        aria-label={isDrawerOpen ? "Close navigation menu" : "Open navigation menu"}
       >
-        <span className="text-xl leading-none">☰</span>
+        <span className="text-xl leading-none">{isDrawerOpen ? '✕' : '☰'}</span>
       </button>
 
       {/* Mobile drawer overlay */}
@@ -57,23 +57,12 @@ export function ChapterSidebar({ bookTitle, currentSlug, chapters, sections, nex
           className="md:hidden fixed top-0 right-0 h-full w-72 bg-white z-50"
         >
           <div className="p-6 h-full overflow-y-auto">
-            {/* Close button */}
-            <button
-              data-testid="mobile-nav-close"
-              onClick={() => setIsDrawerOpen(false)}
-              className="absolute top-4 left-4 p-2 text-gray-600 hover:text-gray-900"
-              aria-label="Close navigation menu"
-            >
-              <span className="text-xl">✕</span>
-            </button>
-
             {/* Book title */}
             <a
               href="/"
               data-testid="sidebar-book-title"
-              className="inline-flex items-center gap-2.5 font-caveat text-2xl text-white bg-[#2c2c2c] px-5 py-3 rounded-lg no-underline mb-10 whitespace-nowrap"
+              className="inline-flex items-center font-caveat text-2xl text-white bg-[#2c2c2c] px-5 py-3 rounded-lg no-underline mb-10 whitespace-nowrap"
             >
-              <span className="text-lg">☰</span>
               {bookTitle}
             </a>
 
@@ -128,9 +117,8 @@ export function ChapterSidebar({ bookTitle, currentSlug, chapters, sections, nex
       <a
         href="/"
         data-testid="sidebar-book-title"
-        className="inline-flex items-center gap-2.5 font-caveat text-2xl text-white bg-[#2c2c2c] px-5 py-3 rounded-lg no-underline mb-10 whitespace-nowrap"
+        className="inline-flex items-center font-caveat text-2xl text-white bg-[#2c2c2c] px-5 py-3 rounded-lg no-underline mb-10 whitespace-nowrap"
       >
-        <span className="text-lg">☰</span>
         {bookTitle}
       </a>
 
