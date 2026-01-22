@@ -1,5 +1,6 @@
 import { ChapterTitle, ChapterIntro, SectionHeading, ChapterSidebar } from '@/components/chapter'
 import { Highlight, MarginNote, Sketch, PainPoints, PainPointItem, BigQuote, Divider } from '@/components/content'
+import { Prompt } from '@/components/portable-text/blocks/Prompt'
 
 const BOOK_TITLE = 'The Jetty Method'
 
@@ -13,6 +14,7 @@ const sections = [
   { id: 'sketches', title: 'Sketches' },
   { id: 'pain-points', title: 'Pain Points' },
   { id: 'quotes', title: 'Quotes' },
+  { id: 'prompts', title: 'Prompts' },
 ]
 
 export default function VisualBlocksDemoPage() {
@@ -106,6 +108,23 @@ export default function VisualBlocksDemoPage() {
             <p className="leading-relaxed font-serif" data-testid="body-text">
               Use quotes sparingly to maintain their impact. They work best for
               key insights or principles that readers should remember.
+            </p>
+          </section>
+
+          <Divider symbol="●" />
+
+          <section className="mb-12">
+            <SectionHeading id="prompts">Prompts</SectionHeading>
+            <p className="leading-relaxed font-serif mb-6" data-testid="body-text">
+              Prompt blocks display copyable text that readers can use directly.
+              Perfect for code snippets, commands, or templates.
+            </p>
+
+            <Prompt text="Write a function that validates email addresses using a regular expression." />
+
+            <p className="leading-relaxed font-serif mt-6" data-testid="body-text">
+              Click the Copy button to copy the prompt text to your clipboard.
+              The button will briefly show &quot;Copied ✓&quot; as confirmation.
             </p>
           </section>
         </article>
