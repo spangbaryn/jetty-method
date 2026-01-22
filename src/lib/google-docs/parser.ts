@@ -15,6 +15,7 @@
  * - [[ content ]] → MarginNote
  * - ![alt](url) caption → Sketch
  * - --- or *** symbol *** → Divider
+ * - @@@ text @@@ → Prompt (copyable text block)
  */
 
 // Portable Text block types
@@ -74,7 +75,13 @@ export interface Divider {
   symbol?: string
 }
 
-export type PortableTextBlock = PTBlock | BigQuote | PainPoints | MarginNote | Sketch | Divider
+export interface Prompt {
+  _type: 'prompt'
+  _key: string
+  text: string
+}
+
+export type PortableTextBlock = PTBlock | BigQuote | PainPoints | MarginNote | Sketch | Divider | Prompt
 
 export interface ParsedSection {
   heading: string
@@ -333,6 +340,38 @@ export function parseContent(raw: string): PortableTextBlock[] {
         })
       }
       i++
+      continue
+    }
+
+    // Prompt: @@@ text @@@
+    if (line.startsWith('@@@ ') && line.endsWith(' @@@')) {
+      blocks.push({
+        _type: 'prompt',
+        _key: generateKey(),
+        text: line.slice(4, -4),
+      })
+      i++
+      continue
+    }
+
+    // Multi-line Prompt: @@@ text
+    // more text @@@
+    if (line.startsWith('@@@ ') && !line.endsWith(' @@@')) {
+      let content = line.slice(4)
+      i++
+      while (i < lines.length && !lines[i].endsWith(' @@@')) {
+        content += '\n' + lines[i]
+        i++
+      }
+      if (i < lines.length) {
+        content += '\n' + lines[i].slice(0, -4)
+        i++
+      }
+      blocks.push({
+        _type: 'prompt',
+        _key: generateKey(),
+        text: content.trim(),
+      })
       continue
     }
 
