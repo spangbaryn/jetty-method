@@ -35,7 +35,7 @@ export function ChapterSidebar({ bookTitle, currentSlug, chapters, sections, nex
       <button
         data-testid="mobile-menu-button"
         onClick={() => setIsDrawerOpen(true)}
-        className="md:hidden fixed top-4 left-4 z-40 p-2 bg-[#2c2c2c] text-white rounded-lg"
+        className="md:hidden fixed top-4 left-4 z-50 p-2 bg-[#2c2c2c] text-white rounded-lg shadow-lg"
         aria-label="Open navigation menu"
       >
         <span className="text-xl">☰</span>
