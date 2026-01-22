@@ -227,6 +227,9 @@ export function WaitlistCard({ onSubmit }: WaitlistCardProps) {
           <p className="text-sm text-gray-600 font-sans">
             You're on the list!
           </p>
+          <p className="text-sm text-gray-500 font-sans">
+            You'll get a ping when your invite is ready.
+          </p>
         </div>
       )}
 
@@ -236,6 +239,9 @@ export function WaitlistCard({ onSubmit }: WaitlistCardProps) {
           <div className="text-2xl mb-1">&#10003;</div>
           <p className="text-sm text-gray-600 font-sans">
             You're already on the list!
+          </p>
+          <p className="text-sm text-gray-500 font-sans">
+            You'll get a ping when your invite is ready.
           </p>
         </div>
       )}
