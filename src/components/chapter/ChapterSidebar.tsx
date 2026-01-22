@@ -114,7 +114,7 @@ export function ChapterSidebar({ bookTitle, currentSlug, chapters, sections, nex
         data-testid="chapter-sidebar"
         className="hidden md:block w-72 shrink-0 sticky top-0 h-screen overflow-y-auto py-12 pr-8 border-gray-200"
       >
-      <div className="text-right">
+      <div className="flex justify-end">
         <a
           href="/"
           data-testid="sidebar-book-title"
