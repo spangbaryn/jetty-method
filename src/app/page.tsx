@@ -54,29 +54,30 @@ export default async function Home() {
           {chapters.map((chapter) => {
             const isPart = chapter.title.toUpperCase().startsWith('PART')
             return (
-            <li key={chapter.slug.current} data-testid="toc-chapter" className={isPart ? 'mt-10 first:mt-0' : ''}>
-              <Link
-                href={`/chapters/${chapter.slug.current}`}
-                className={`font-serif font-semibold text-gray-900 hover:text-blue-600 hover:underline transition-colors block focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded ${isPart ? 'text-2xl' : 'text-xl'}`}
-              >
-                {chapter.title}
-              </Link>
-              {chapter.sections && chapter.sections.length > 0 && (
-                <ul className="mt-2 ml-8 space-y-1">
-                  {chapter.sections.map((section) => (
-                    <li key={section.anchor.current} data-testid="toc-section">
-                      <Link
-                        href={`/chapters/${chapter.slug.current}#${section.anchor.current}`}
-                        className="text-base text-gray-700 hover:text-blue-600 hover:underline transition-colors"
-                      >
-                        {section.heading}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </li>
-          ))}
+              <li key={chapter.slug.current} data-testid="toc-chapter" className={isPart ? 'mt-10 first:mt-0' : ''}>
+                <Link
+                  href={`/chapters/${chapter.slug.current}`}
+                  className={`font-serif font-semibold text-gray-900 hover:text-blue-600 hover:underline transition-colors block focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded ${isPart ? 'text-2xl' : 'text-xl'}`}
+                >
+                  {chapter.title}
+                </Link>
+                {chapter.sections && chapter.sections.length > 0 && (
+                  <ul className="mt-2 ml-8 space-y-1">
+                    {chapter.sections.map((section) => (
+                      <li key={section.anchor.current} data-testid="toc-section">
+                        <Link
+                          href={`/chapters/${chapter.slug.current}#${section.anchor.current}`}
+                          className="text-base text-gray-700 hover:text-blue-600 hover:underline transition-colors"
+                        >
+                          {section.heading}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </li>
+            )
+          })}
         </ul>
 
         {chapters.length === 0 && (
