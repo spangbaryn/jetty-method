@@ -84,6 +84,20 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
             )
           })}
         </article>
+
+        {nextChapter && (
+          <div className="mt-12 pt-8 border-t border-gray-200">
+            <a
+              href={`/chapters/${nextChapter.slug}`}
+              data-testid="next-chapter-bottom-link"
+              className="inline-flex items-center gap-2 text-lg font-semibold text-[#1a3a4a] hover:underline"
+            >
+              <span>Next: {nextChapter.title}</span>
+              <span aria-hidden="true">→</span>
+            </a>
+          </div>
+        )}
+
         <ReadingProgressTracker
           chapterSlug={slug}
           sectionIds={sectionList.map((s) => s.id)}
