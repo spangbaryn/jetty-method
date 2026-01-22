@@ -5,6 +5,7 @@ import { BigQuote } from './blocks/BigQuote'
 import { Divider } from './blocks/Divider'
 import { MarginNote } from './blocks/MarginNote'
 import { PainPoints } from './blocks/PainPoints'
+import { Prompt } from './blocks/Prompt'
 import { Sketch } from './blocks/Sketch'
 import { Highlight } from './blocks/Highlight'
 
@@ -14,6 +15,7 @@ const components: PortableTextComponents = {
     divider: ({ value }) => <Divider symbol={value.symbol} />,
     marginNote: ({ value }) => <MarginNote content={value.content} />,
     painPoints: ({ value }) => <PainPoints label={value.label} items={value.items} />,
+    prompt: ({ value }) => <Prompt text={value.text} />,
     sketch: ({ value }) => <Sketch image={value.image} alt={value.alt} caption={value.caption} />,
   },
   marks: {

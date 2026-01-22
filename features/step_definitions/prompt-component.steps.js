@@ -55,9 +55,8 @@ Then('a prompt block is created with text {string}', function (expectedText) {
 // FEATURE SCENARIO STEPS (UI)
 
 Given('I am on a chapter page with a prompt block', async function () {
-  // Navigate to a chapter that has a prompt block
-  // For testing, we'll use a test page or the introduction which we can add a prompt to
-  await page.goto(`${BASE_URL}/chapters/introduction`);
+  // Navigate to the visual-blocks-demo page which has a prompt block
+  await page.goto(`${BASE_URL}/chapters/visual-blocks-demo`);
   await expect(page.locator('main')).toBeVisible();
 });
 
