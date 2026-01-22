@@ -104,12 +104,13 @@ export function ChapterSidebar({ bookTitle, currentSlug, chapters, sections, nex
             )}
 
             {nextChapter && (
-              <div className="mt-8 text-right">
+              <div className="mt-8 pt-6 border-t border-gray-200 text-right">
                 <a
                   href={`/chapters/${nextChapter.slug}`}
-                  className="block text-base text-[#1a3a4a] hover:underline"
+                  className="inline-flex items-center justify-end gap-2 text-base font-semibold text-[#1a3a4a] hover:underline"
                 >
-                  Next: {nextChapter.title}
+                  <span>Next: {nextChapter.title}</span>
+                  <span aria-hidden="true">→</span>
                 </a>
               </div>
             )}
@@ -159,13 +160,14 @@ export function ChapterSidebar({ bookTitle, currentSlug, chapters, sections, nex
       )}
 
       {nextChapter && (
-        <div className="mt-8 text-right">
+        <div className="mt-8 pt-6 border-t border-gray-200 text-right">
           <a
             href={`/chapters/${nextChapter.slug}`}
             data-testid="next-chapter-link"
-            className="block text-base text-[#1a3a4a] hover:underline"
+            className="inline-flex items-center justify-end gap-2 text-base font-semibold text-[#1a3a4a] hover:underline"
           >
-            Next: {nextChapter.title}
+            <span>Next: {nextChapter.title}</span>
+            <span aria-hidden="true">→</span>
           </a>
         </div>
       )}
