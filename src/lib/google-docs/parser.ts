@@ -7,6 +7,8 @@
  * Syntax Reference:
  * - # Chapter Title
  * - ## Section Heading
+ * - **text** → bold
+ * - *text* → italic
  * - $ text $ → yellow highlight
  * - $$ text $$ → green highlight
  * - $$$ text $$$ → blue highlight
@@ -107,20 +109,22 @@ export function resetKeyCounter(): void {
 }
 
 /**
- * Parse inline content for highlights and links
+ * Parse inline content for highlights, bold, italic, and links
  */
 function parseInline(text: string): { children: PTSpan[], markDefs: MarkDef[] } {
   const children: PTSpan[] = []
   const markDefs: MarkDef[] = []
 
-  // Regex to match highlights: $$$ (blue), $$ (green), $ (yellow)
+  // Combined regex for all inline formatting
   // Order matters: match longer patterns first
-  const highlightRegex = /(\$\$\$[^$]+\$\$\$|\$\$[^$]+\$\$|\$[^$]+\$)/g
+  // - $$$ (blue highlight), $$ (green), $ (yellow)
+  // - ** (bold), * (italic)
+  const inlineRegex = /(\$\$\$[^$]+\$\$\$|\$\$[^$]+\$\$|\$[^$]+\$|\*\*[^*]+\*\*|\*[^*]+\*)/g
 
   let lastIndex = 0
   let match: RegExpExecArray | null
 
-  while ((match = highlightRegex.exec(text)) !== null) {
+  while ((match = inlineRegex.exec(text)) !== null) {
     // Text before match
     if (match.index > lastIndex) {
       children.push({
@@ -131,35 +135,45 @@ function parseInline(text: string): { children: PTSpan[], markDefs: MarkDef[] } 
     }
 
     const raw = match[0]
-    let style: 'yellow' | 'green' | 'blue'
     let content: string
+    let marks: string[] = []
 
     if (raw.startsWith('$$$')) {
-      style = 'blue'
+      // Blue highlight
       content = raw.slice(3, -3)
+      const markKey = generateKey()
+      markDefs.push({ _type: 'highlight', _key: markKey, style: 'blue' })
+      marks = [markKey]
     } else if (raw.startsWith('$$')) {
-      style = 'green'
+      // Green highlight
       content = raw.slice(2, -2)
-    } else {
-      style = 'yellow'
+      const markKey = generateKey()
+      markDefs.push({ _type: 'highlight', _key: markKey, style: 'green' })
+      marks = [markKey]
+    } else if (raw.startsWith('$')) {
+      // Yellow highlight
       content = raw.slice(1, -1)
+      const markKey = generateKey()
+      markDefs.push({ _type: 'highlight', _key: markKey, style: 'yellow' })
+      marks = [markKey]
+    } else if (raw.startsWith('**')) {
+      // Bold
+      content = raw.slice(2, -2)
+      marks = ['strong']
+    } else {
+      // Italic (single *)
+      content = raw.slice(1, -1)
+      marks = ['em']
     }
-
-    const markKey = generateKey()
-    markDefs.push({
-      _type: 'highlight',
-      _key: markKey,
-      style,
-    })
 
     children.push({
       _type: 'span',
       _key: generateKey(),
       text: content,
-      marks: [markKey],
+      marks,
     })
 
-    lastIndex = highlightRegex.lastIndex
+    lastIndex = inlineRegex.lastIndex
   }
 
   // Remaining text
