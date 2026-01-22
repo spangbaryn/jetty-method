@@ -141,7 +141,7 @@ export function WaitlistSection({ onSubmit }: WaitlistSectionProps) {
               One more thing:
             </p>
             <h3 className="text-xl font-semibold mb-6 font-serif">
-              Want a weekly email with vibe coding tips?
+              Want a weekly email from Erik on implementing the Jetty Method?
             </h3>
             <div className="space-y-3">
               <button
