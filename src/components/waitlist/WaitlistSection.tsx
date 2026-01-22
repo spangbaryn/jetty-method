@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 
-type Step = 'email' | 'experience' | 'newsletter' | 'success' | 'duplicate' | 'error'
+type Step = 'email' | 'experience' | 'success' | 'duplicate' | 'error'
 type ExperienceLevel = 'none' | 'some' | 'active'
 
 interface WaitlistSectionProps {
@@ -43,17 +43,13 @@ export function WaitlistSection({ onSubmit }: WaitlistSectionProps) {
     setStep('experience')
   }
 
-  const handleExperienceSelect = (experience: ExperienceLevel) => {
+  const handleExperienceSelect = async (experience: ExperienceLevel) => {
     setSelectedExperience(experience)
-    setStep('newsletter')
-  }
-
-  const handleNewsletterChoice = async (wantsNewsletter: boolean) => {
     setIsSubmitting(true)
 
     if (onSubmit) {
       try {
-        await onSubmit({ email, experience: selectedExperience!, newsletter: wantsNewsletter })
+        await onSubmit({ email, experience, newsletter: false })
         setIsSubmitting(false)
         localStorage.setItem('waitlist_submitted', 'true')
         setStep('success')
@@ -66,7 +62,7 @@ export function WaitlistSection({ onSubmit }: WaitlistSectionProps) {
         const response = await fetch('/api/waitlist', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, experience: selectedExperience, newsletter: wantsNewsletter })
+          body: JSON.stringify({ email, experience, newsletter: false })
         })
 
         setIsSubmitting(false)
@@ -89,7 +85,7 @@ export function WaitlistSection({ onSubmit }: WaitlistSectionProps) {
   }
 
   const handleRetry = () => {
-    setStep('newsletter')
+    setStep('experience')
   }
 
   if (hasSubmitted) return null
@@ -185,48 +181,7 @@ export function WaitlistSection({ onSubmit }: WaitlistSectionProps) {
           </div>
         )}
 
-        {/* Step 3: Newsletter opt-in */}
-        {step === 'newsletter' && (
-          <div data-testid="waitlist-newsletter-step">
-            <p className="text-gray-600 mb-4 font-sans">
-              One more thing:
-            </p>
-            <h3 className="text-xl font-semibold mb-6 font-serif">
-              Level up your natural language coding with a weekly email from{' '}
-              <a
-                href="https://www.linkedin.com/in/espangenberg/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-900 underline hover:text-gray-600"
-              >
-                Erik
-              </a>
-              ?
-            </h3>
-            <div className="space-y-3">
-              <button
-                onClick={() => handleNewsletterChoice(true)}
-                disabled={isSubmitting}
-                data-testid="waitlist-newsletter-option"
-                data-value="yes"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg hover:border-gray-900 hover:bg-gray-50 transition-colors text-left disabled:opacity-50"
-              >
-                <span className="font-medium">Yes, sign me up</span>
-              </button>
-              <button
-                onClick={() => handleNewsletterChoice(false)}
-                disabled={isSubmitting}
-                data-testid="waitlist-newsletter-option"
-                data-value="no"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg hover:border-gray-900 hover:bg-gray-50 transition-colors text-left disabled:opacity-50"
-              >
-                <span className="font-medium">No thanks</span>
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Step 4: Success */}
+        {/* Step 3: Success */}
         {step === 'success' && (
           <div data-testid="waitlist-success">
             <div className="text-4xl mb-4">&#10003;</div>
