@@ -25,7 +25,7 @@ export function Prompt({ text }: PromptProps) {
           className="text-xs font-semibold text-gray-500 uppercase tracking-wider"
           data-testid="prompt-label"
         >
-          PROMPT
+          EXAMPLE PROMPT
         </span>
         <button
           onClick={handleCopy}
