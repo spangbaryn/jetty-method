@@ -1,12 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
-type Step = 'email' | 'experience' | 'success' | 'duplicate' | 'error'
+type Step = 'email' | 'experience' | 'newsletter' | 'success' | 'duplicate' | 'error'
 type ExperienceLevel = 'none' | 'some' | 'active'
 
 interface WaitlistSectionProps {
-  onSubmit?: (data: { email: string; experience: ExperienceLevel }) => Promise<void>
+  onSubmit?: (data: { email: string; experience: ExperienceLevel; newsletter: boolean }) => Promise<void>
 }
 
 export function WaitlistSection({ onSubmit }: WaitlistSectionProps) {
@@ -15,6 +15,11 @@ export function WaitlistSection({ onSubmit }: WaitlistSectionProps) {
   const [emailError, setEmailError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [selectedExperience, setSelectedExperience] = useState<ExperienceLevel | null>(null)
+  const [hasSubmitted, setHasSubmitted] = useState(true) // Start true to prevent flash
+
+  useEffect(() => {
+    setHasSubmitted(localStorage.getItem('waitlist_submitted') === 'true')
+  }, [])
 
   const validateEmail = (email: string): string | null => {
     if (!email.trim()) {
@@ -38,36 +43,42 @@ export function WaitlistSection({ onSubmit }: WaitlistSectionProps) {
     setStep('experience')
   }
 
-  const handleExperienceSelect = async (experience: ExperienceLevel) => {
-    setIsSubmitting(true)
+  const handleExperienceSelect = (experience: ExperienceLevel) => {
     setSelectedExperience(experience)
+    setStep('newsletter')
+  }
+
+  const handleNewsletterChoice = async (wantsNewsletter: boolean) => {
+    setIsSubmitting(true)
 
     if (onSubmit) {
       try {
-        await onSubmit({ email, experience })
+        await onSubmit({ email, experience: selectedExperience!, newsletter: wantsNewsletter })
         setIsSubmitting(false)
+        localStorage.setItem('waitlist_submitted', 'true')
         setStep('success')
       } catch {
         setIsSubmitting(false)
         setStep('error')
       }
     } else {
-      // Default: POST to API
       try {
         const response = await fetch('/api/waitlist', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, experience })
+          body: JSON.stringify({ email, experience: selectedExperience, newsletter: wantsNewsletter })
         })
 
         setIsSubmitting(false)
 
         const data = await response.json()
         if (data.error === 'duplicate') {
+          localStorage.setItem('waitlist_submitted', 'true')
           setStep('duplicate')
         } else if (!response.ok) {
           setStep('error')
         } else {
+          localStorage.setItem('waitlist_submitted', 'true')
           setStep('success')
         }
       } catch {
@@ -78,10 +89,10 @@ export function WaitlistSection({ onSubmit }: WaitlistSectionProps) {
   }
 
   const handleRetry = () => {
-    if (selectedExperience) {
-      handleExperienceSelect(selectedExperience)
-    }
+    setStep('newsletter')
   }
+
+  if (hasSubmitted) return null
 
   return (
     <section
@@ -174,7 +185,48 @@ export function WaitlistSection({ onSubmit }: WaitlistSectionProps) {
           </div>
         )}
 
-        {/* Step 3: Success */}
+        {/* Step 3: Newsletter opt-in */}
+        {step === 'newsletter' && (
+          <div data-testid="waitlist-newsletter-step">
+            <p className="text-gray-600 mb-4 font-sans">
+              One more thing:
+            </p>
+            <h3 className="text-xl font-semibold mb-6 font-serif">
+              Level up your natural language coding with a weekly email from{' '}
+              <a
+                href="https://www.linkedin.com/in/espangenberg/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-900 underline hover:text-gray-600"
+              >
+                Erik
+              </a>
+              ?
+            </h3>
+            <div className="space-y-3">
+              <button
+                onClick={() => handleNewsletterChoice(true)}
+                disabled={isSubmitting}
+                data-testid="waitlist-newsletter-option"
+                data-value="yes"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg hover:border-gray-900 hover:bg-gray-50 transition-colors text-left disabled:opacity-50"
+              >
+                <span className="font-medium">Yes, sign me up</span>
+              </button>
+              <button
+                onClick={() => handleNewsletterChoice(false)}
+                disabled={isSubmitting}
+                data-testid="waitlist-newsletter-option"
+                data-value="no"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg hover:border-gray-900 hover:bg-gray-50 transition-colors text-left disabled:opacity-50"
+              >
+                <span className="font-medium">No thanks</span>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Step 4: Success */}
         {step === 'success' && (
           <div data-testid="waitlist-success">
             <div className="text-4xl mb-4">&#10003;</div>
