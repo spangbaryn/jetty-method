@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 
-type Step = 'email' | 'experience' | 'success' | 'duplicate' | 'error'
+type Step = 'email' | 'experience' | 'newsletter' | 'success' | 'duplicate' | 'error'
 type ExperienceLevel = 'none' | 'some' | 'active'
 
 interface WaitlistSectionProps {
@@ -43,13 +43,17 @@ export function WaitlistSection({ onSubmit }: WaitlistSectionProps) {
     setStep('experience')
   }
 
-  const handleExperienceSelect = async (experience: ExperienceLevel) => {
+  const handleExperienceSelect = (experience: ExperienceLevel) => {
     setSelectedExperience(experience)
+    setStep('newsletter')
+  }
+
+  const handleNewsletterChoice = async (wantsNewsletter: boolean) => {
     setIsSubmitting(true)
 
     if (onSubmit) {
       try {
-        await onSubmit({ email, experience, newsletter: false })
+        await onSubmit({ email, experience: selectedExperience!, newsletter: wantsNewsletter })
         setIsSubmitting(false)
         localStorage.setItem('waitlist_submitted', 'true')
         setStep('success')
@@ -62,7 +66,7 @@ export function WaitlistSection({ onSubmit }: WaitlistSectionProps) {
         const response = await fetch('/api/waitlist', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, experience, newsletter: false })
+          body: JSON.stringify({ email, experience: selectedExperience, newsletter: wantsNewsletter })
         })
 
         setIsSubmitting(false)
@@ -85,7 +89,7 @@ export function WaitlistSection({ onSubmit }: WaitlistSectionProps) {
   }
 
   const handleRetry = () => {
-    setStep('experience')
+    setStep('newsletter')
   }
 
   if (hasSubmitted) return null
@@ -181,7 +185,39 @@ export function WaitlistSection({ onSubmit }: WaitlistSectionProps) {
           </div>
         )}
 
-        {/* Step 3: Success */}
+        {/* Step 3: Newsletter Question */}
+        {step === 'newsletter' && (
+          <div data-testid="waitlist-newsletter-step">
+            <p className="text-gray-600 mb-4 font-sans">
+              One more thing:
+            </p>
+            <h3 className="text-xl font-semibold mb-6 font-serif">
+              Want a weekly email with vibe coding tips?
+            </h3>
+            <div className="space-y-3">
+              <button
+                onClick={() => handleNewsletterChoice(true)}
+                disabled={isSubmitting}
+                data-testid="waitlist-newsletter-yes"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg hover:border-gray-900 hover:bg-gray-50 transition-colors text-left disabled:opacity-50"
+              >
+                <span className="font-medium">Yes, sign me up</span>
+                <span className="text-gray-500 text-sm block">I'd like weekly tips and updates</span>
+              </button>
+              <button
+                onClick={() => handleNewsletterChoice(false)}
+                disabled={isSubmitting}
+                data-testid="waitlist-newsletter-no"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg hover:border-gray-900 hover:bg-gray-50 transition-colors text-left disabled:opacity-50"
+              >
+                <span className="font-medium">No thanks</span>
+                <span className="text-gray-500 text-sm block">Just the waitlist for now</span>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Step 4: Success */}
         {step === 'success' && (
           <div data-testid="waitlist-success">
             <div className="text-4xl mb-4">&#10003;</div>
