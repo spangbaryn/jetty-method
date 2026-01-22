@@ -2,11 +2,10 @@
 
 import { useState, useEffect } from 'react'
 
-type Step = 'collapsed' | 'email' | 'experience' | 'newsletter' | 'success' | 'duplicate' | 'error'
-type ExperienceLevel = 'none' | 'some' | 'active'
+type Step = 'collapsed' | 'email' | 'newsletter' | 'success' | 'duplicate' | 'error'
 
 interface WaitlistCardProps {
-  onSubmit?: (data: { email: string; experience: ExperienceLevel; newsletter: boolean }) => Promise<void>
+  onSubmit?: (data: { email: string; newsletter: boolean }) => Promise<void>
 }
 
 export function WaitlistCard({ onSubmit }: WaitlistCardProps) {
@@ -14,7 +13,6 @@ export function WaitlistCard({ onSubmit }: WaitlistCardProps) {
   const [email, setEmail] = useState('')
   const [emailError, setEmailError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [selectedExperience, setSelectedExperience] = useState<ExperienceLevel | null>(null)
   const [hasSubmitted, setHasSubmitted] = useState(true) // Start true to prevent flash
 
   useEffect(() => {
@@ -44,11 +42,6 @@ export function WaitlistCard({ onSubmit }: WaitlistCardProps) {
       return
     }
     setEmailError('')
-    setStep('experience')
-  }
-
-  const handleExperienceSelect = (experience: ExperienceLevel) => {
-    setSelectedExperience(experience)
     setStep('newsletter')
   }
 
@@ -57,7 +50,7 @@ export function WaitlistCard({ onSubmit }: WaitlistCardProps) {
 
     if (onSubmit) {
       try {
-        await onSubmit({ email, experience: selectedExperience!, newsletter: wantsNewsletter })
+        await onSubmit({ email, newsletter: wantsNewsletter })
         setIsSubmitting(false)
         localStorage.setItem('waitlist_submitted', 'true')
         setStep('success')
@@ -70,7 +63,7 @@ export function WaitlistCard({ onSubmit }: WaitlistCardProps) {
         const response = await fetch('/api/waitlist', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, experience: selectedExperience, newsletter: wantsNewsletter })
+          body: JSON.stringify({ email, newsletter: wantsNewsletter })
         })
 
         setIsSubmitting(false)
@@ -151,38 +144,6 @@ export function WaitlistCard({ onSubmit }: WaitlistCardProps) {
               Continue
             </button>
           </form>
-        </div>
-      )}
-
-      {/* Experience step */}
-      {step === 'experience' && (
-        <div>
-          <p className="text-sm text-gray-600 mb-3 font-sans">
-            Vibe coding experience?
-          </p>
-          <div className="space-y-2">
-            <button
-              onClick={() => handleExperienceSelect('none')}
-              disabled={isSubmitting}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg hover:border-gray-900 hover:bg-gray-50 transition-colors text-left disabled:opacity-50"
-            >
-              None yet
-            </button>
-            <button
-              onClick={() => handleExperienceSelect('some')}
-              disabled={isSubmitting}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg hover:border-gray-900 hover:bg-gray-50 transition-colors text-left disabled:opacity-50"
-            >
-              Some experiments
-            </button>
-            <button
-              onClick={() => handleExperienceSelect('active')}
-              disabled={isSubmitting}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg hover:border-gray-900 hover:bg-gray-50 transition-colors text-left disabled:opacity-50"
-            >
-              Actively using it
-            </button>
-          </div>
         </div>
       )}
 
