@@ -1,14 +1,21 @@
 import { NextResponse } from 'next/server'
 
 const MAILERLITE_API_KEY = process.env.MAILERLITE_API_KEY
-const MAILERLITE_GROUP_ID = process.env.MAILERLITE_GROUP_ID
+const WAITLIST_GROUP_ID = '177237166380812033'
+const NEWSLETTER_GROUP_ID = '177319791881618855'
 
 export async function POST(request: Request) {
   const { email, experience, newsletter } = await request.json()
 
-  if (!MAILERLITE_API_KEY || !MAILERLITE_GROUP_ID) {
-    console.error('MailerLite environment variables not configured')
+  if (!MAILERLITE_API_KEY) {
+    console.error('MailerLite API key not configured')
     return NextResponse.json({ success: false, error: 'server_error' }, { status: 500 })
+  }
+
+  // Build groups array: always include waitlist, add newsletter if opted in
+  const groups = [WAITLIST_GROUP_ID]
+  if (newsletter) {
+    groups.push(NEWSLETTER_GROUP_ID)
   }
 
   const response = await fetch('https://connect.mailerlite.com/api/subscribers', {
@@ -19,10 +26,9 @@ export async function POST(request: Request) {
     },
     body: JSON.stringify({
       email,
-      groups: [MAILERLITE_GROUP_ID],
+      groups,
       fields: {
-        experience: experience,
-        newsletter: newsletter ? 'yes' : 'no'
+        experience: experience
       }
     })
   })
