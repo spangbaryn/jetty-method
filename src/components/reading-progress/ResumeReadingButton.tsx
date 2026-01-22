@@ -11,7 +11,7 @@ interface ResumeReadingButtonProps {
 
 /**
  * Shows either:
- * - "Start" button for new users (no progress) → links to first chapter
+ * - "Start" button for new users (no progress) → links to /chapters/introduction
  * - "Pick up where you left off" for returning users → resumes saved position
  */
 export function ResumeReadingButton({ chapterSlugs = [] }: ResumeReadingButtonProps) {
@@ -34,14 +34,13 @@ export function ResumeReadingButton({ chapterSlugs = [] }: ResumeReadingButtonPr
     return null
   }
 
-  const firstChapter = chapterSlugs[0]
   const hasProgress = progress && chapterSlugs.includes(progress.chapter)
 
-  // New user: show "Start" linking to first chapter
+  // New user: show "Start" linking to introduction
   if (!hasProgress) {
     return (
       <Link
-        href={`/chapters/${firstChapter}`}
+        href="/chapters/introduction"
         data-testid="start-reading-button"
         className="inline-flex items-center gap-2 px-6 py-3 mt-6 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors font-medium"
       >
