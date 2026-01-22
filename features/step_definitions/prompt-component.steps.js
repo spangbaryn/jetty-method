@@ -29,12 +29,21 @@ Given('content with {string}', function (content) {
   testContent = content;
 });
 
-When('the content is parsed', function () {
-  // Dynamic import to handle worktree path
+When('the content is parsed', async function () {
+  // Use tsx to import TypeScript module
   const path = require('path');
-  const parserPath = path.join(__dirname, '../../src/lib/google-docs/parser');
-  const parser = require(parserPath);
-  parsedContent = parser.parseContent(testContent);
+  const parserPath = path.join(__dirname, '../../src/lib/google-docs/parser.ts');
+
+  // Use tsx for TypeScript compilation
+  const { register } = require('tsx/cjs/api');
+  const unregister = register();
+
+  try {
+    const parser = require(parserPath);
+    parsedContent = parser.parseContent(testContent);
+  } finally {
+    unregister();
+  }
 });
 
 Then('a prompt block is created with text {string}', function (expectedText) {
