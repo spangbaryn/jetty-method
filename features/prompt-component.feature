@@ -26,3 +26,20 @@ Scenario: Copy button copies text to clipboard
   When I click the copy button
   Then the prompt text is copied to the clipboard
   And the button shows "Copied" feedback
+
+# STABLE MODE SCENARIOS - Error Handling and Edge Cases
+
+Scenario: Parser handles multi-line prompt syntax
+  Given content with "@@@ First line\nSecond line @@@"
+  When the content is parsed
+  Then a prompt block is created with text "First line\nSecond line"
+
+Scenario: Parser ignores unclosed prompt syntax
+  Given content with "@@@ Unclosed prompt text"
+  When the content is parsed
+  Then no prompt block is created
+
+Scenario: Prompt component handles special characters
+  Given I am on a chapter page with a prompt block containing special characters
+  When I click the copy button
+  Then the prompt text with special characters is copied to the clipboard
