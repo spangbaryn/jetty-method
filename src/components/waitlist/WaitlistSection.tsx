@@ -234,7 +234,7 @@ export function WaitlistSection({ onSubmit }: WaitlistSectionProps) {
               You're on the list!
             </h3>
             <p className="text-gray-600 font-sans">
-              We'll let you know when JettyPod is ready.
+              You'll get a ping when your invite is ready.
             </p>
           </div>
         )}
@@ -247,7 +247,7 @@ export function WaitlistSection({ onSubmit }: WaitlistSectionProps) {
               You're already on the list!
             </h3>
             <p className="text-gray-600 font-sans">
-              We'll let you know when JettyPod is ready.
+              You'll get a ping when your invite is ready.
             </p>
           </div>
         )}
